@@ -8,12 +8,15 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.timeout.IdleStateHandler;
-import org.net.util.SpringContextHolder;
+import org.net.handler.MsgpackDecoder;
+import org.net.handler.MsgpackEncoder;
 import org.net.io.handler.BussnessHandler;
-import org.net.springextensible.BeanDef;
+import org.net.springextensible.RegistrationBeanDef;
+import org.net.util.SpringContextHolder;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -22,14 +25,12 @@ import java.util.concurrent.TimeUnit;
  * @Date 2019/11/1 22:49
  * @Created by admin
  */
-
 @Component
-public class NettyServer {
+public class NettyServer implements ApplicationListener<ContextRefreshedEvent> {
 
-    @PostConstruct
     public void run() {
-        // 获取配置的参数：port 以及 timetout
-        BeanDef beanDef = SpringContextHolder.getBean(BeanDef.class);
+        // 获取配置的参数：port 以及 timeout
+        RegistrationBeanDef beanDef = SpringContextHolder.getBean(RegistrationBeanDef.class);
         // 创建Boss：作用于客户端的连接
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         // 创建woker：作用于迭代器可用的连接
@@ -50,11 +51,9 @@ public class NettyServer {
                         socketChannel.pipeline().addLast("MessagePack Decoder", new MsgpackDecoder());
                         pipeline.addLast(new BussnessHandler());
                     }
-                }).
-                // 缓冲区
-                 option(ChannelOption.SO_BACKLOG, 2048*2048*2048);
+                }).option(ChannelOption.SO_BACKLOG, 2048 * 2048 * 2048);
         try {
-            ChannelFuture channelFuture = bootstrap.bind(Integer.valueOf(beanDef.getPort())).sync();
+            ChannelFuture channelFuture = bootstrap.bind(beanDef.getPort()).sync();
         } catch (InterruptedException e) {
             e.printStackTrace();
             // 异常情况优雅关闭
@@ -63,5 +62,8 @@ public class NettyServer {
         }
     }
 
-
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
+        this.run();
+    }
 }

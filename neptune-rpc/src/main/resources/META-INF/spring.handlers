@@ -1,1 +1,1 @@
-http\://www.neptune-rpc.org/schema/neptune-common=org.neptune.rpc.springextensible.BeanDefinationNamespaceHandler
+http\://www.neptune-rpc.org/schema/neptune-rpc=org.net.springextensible.handler.BeanDefNamespaceHandler

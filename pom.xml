@@ -18,9 +18,7 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>neptune-satellite</module>
-        <module>neptune-common</module>
         <module>neptune-rpc</module>
-        <module>neptune-example</module>
         <module>neptune-serializable</module>
     </modules>
 
