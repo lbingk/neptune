@@ -1,4 +1,4 @@
-package org.company;
+package org.net;
 
 /**
  * Hello world!
