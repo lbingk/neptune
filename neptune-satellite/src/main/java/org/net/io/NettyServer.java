@@ -8,6 +8,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.timeout.IdleStateHandler;
+import org.net.collection.RegistrationDirectory;
 import org.net.handler.MsgpackDecoder;
 import org.net.handler.MsgpackEncoder;
 import org.net.io.handler.BussnessHandler;
@@ -45,10 +46,10 @@ public class NettyServer implements ApplicationListener<ContextRefreshedEvent> {
                         // 解码，编码以及业务逻辑处理链，10秒没有发生写事件，就触发userEventTriggered
                         ChannelPipeline pipeline = socketChannel.pipeline();
                         socketChannel.pipeline().addLast(new IdleStateHandler(0, 10, 0, TimeUnit.SECONDS));
-                        socketChannel.pipeline().addLast("frameEncoder", new LengthFieldPrepender(2));
-                        socketChannel.pipeline().addLast("MessagePack encoder", new MsgpackEncoder());
                         socketChannel.pipeline().addLast("frameDecoder", new LengthFieldBasedFrameDecoder(65535, 0, 2, 0, 2));
                         socketChannel.pipeline().addLast("MessagePack Decoder", new MsgpackDecoder());
+                        socketChannel.pipeline().addLast("frameEncoder", new LengthFieldPrepender(2));
+                        socketChannel.pipeline().addLast("MessagePack encoder", new MsgpackEncoder());
                         pipeline.addLast(new BussnessHandler());
                     }
                 }).option(ChannelOption.SO_BACKLOG, 2048 * 2048 * 2048);
@@ -65,5 +66,6 @@ public class NettyServer implements ApplicationListener<ContextRefreshedEvent> {
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
         this.run();
+        RegistrationDirectory.refreshBeanInfonMap();
     }
 }

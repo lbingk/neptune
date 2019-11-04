@@ -1,5 +1,6 @@
 package org.net.springextensible.parser;
 
+import org.net.collection.ServiceBeanInfo;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.RootBeanDefinition;
@@ -10,7 +11,7 @@ import org.w3c.dom.Element;
 /**
  * @program: neptune
  * @description: 暴露服务的Parser类
- * @author: luobingkai
+ * @author: LUOBINGKAI
  * @create: 2019-11-02 15:23
  */
 public class ServiceBeanDefNamespaceParser implements BeanDefinitionParser {
@@ -21,6 +22,8 @@ public class ServiceBeanDefNamespaceParser implements BeanDefinitionParser {
         this.clz = clz;
     }
 
+    public static ServiceBeanInfo serviceBeanInfo = ServiceBeanInfo.getSingleton();
+
     @Override
     public BeanDefinition parse(Element element, ParserContext parserContext) {
         RootBeanDefinition beanDef = new RootBeanDefinition();
@@ -30,6 +33,9 @@ public class ServiceBeanDefNamespaceParser implements BeanDefinitionParser {
         beanDef.getPropertyValues().add("ref", element.getAttribute("ref"));
         BeanDefinitionRegistry beanDefRegistry = parserContext.getRegistry();
         beanDefRegistry.registerBeanDefinition(clz.getName(), beanDef);
+
+        serviceBeanInfo.addServiceBeanDefinationClassName(element.getAttribute("service"));
+
         return beanDef;
     }
 }

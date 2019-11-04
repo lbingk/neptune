@@ -5,7 +5,7 @@ package org.net.service;
 /**
  * @program: neptune
  * @description:
- * @author: luobingkai
+ * @author: LUOBINGKAI
  * @create: 2019-11-02 18:19
  */
 public interface TeacherService {

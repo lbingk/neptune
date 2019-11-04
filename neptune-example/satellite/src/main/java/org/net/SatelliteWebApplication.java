@@ -7,7 +7,7 @@ import org.springframework.context.annotation.ImportResource;
 /**
  * @program: neptune
  * @description:
- * @author: luobingkai
+ * @author: LUOBINGKAI
  * @create: 2019-11-02 11:57
  */
 @SpringBootApplication()

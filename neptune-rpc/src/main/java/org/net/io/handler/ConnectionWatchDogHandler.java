@@ -12,7 +12,7 @@ import org.net.util.SpringContextHolder;
 
 /**
  * @Description 定义看门狗重连处理类，当检查到断线时即可触发
- * @Author luobingkai
+ * @Author LUOBINGKAI
  * @Date 2019/7/21 17:08
  * @Version 1.0
  **/
@@ -23,7 +23,6 @@ public class ConnectionWatchDogHandler extends ChannelInboundHandlerAdapter {
 
     private Bootstrap bootstrap = null;
     private BaseCommonClient client = null;
-    private RegistryBeanDef registryBeanDefination = SpringContextHolder.getBean(RegistryBeanDef.class);
 
     public static ConnectionWatchDogHandler createConnectionWatchDogHandler(Bootstrap _bootstrap, BaseCommonClient _client) {
         ConnectionWatchDogHandler connectionWatchDogHandler = new ConnectionWatchDogHandler();

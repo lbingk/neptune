@@ -8,31 +8,33 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.timeout.IdleStateHandler;
-import org.net.RemoteTransporter;
+import lombok.extern.slf4j.Slf4j;
+import org.net.transport.RemoteTransporter;
 import org.net.handler.MsgpackDecoder;
 import org.net.handler.MsgpackEncoder;
 import org.net.io.handler.BussnessHandler;
+import org.net.io.handler.ConnectionWatchDogHandler;
 import org.net.springextensible.beandef.RegistryBeanDef;
 
 import java.util.concurrent.TimeUnit;
 
 /**
  * @Description 抽取客户端相同的代码
- * @Author luobingkai
+ * @Author LUOBINGKAI
  * @Date 2019/7/23 12:13
  * @Version 1.0
  **/
+@Slf4j
 public abstract class BaseCommonClient {
     private Bootstrap bootstrap = null;
     private Channel channel = null;
     private RemoteTransporter remoteTransporterProvider = null;
     private RegistryBeanDef registryBeanDefination = null;
 
-    public void run(RemoteTransporter remoteTransporterProvider,RegistryBeanDef registryBeanDefination) {
+    public void run(RemoteTransporter remoteTransporterProvider, RegistryBeanDef registryBeanDefination) {
 
-        this.remoteTransporterProvider=remoteTransporterProvider;
-        this.registryBeanDefination=registryBeanDefination;
-
+        this.remoteTransporterProvider = remoteTransporterProvider;
+        this.registryBeanDefination = registryBeanDefination;
 
         // 配置 netty 的启动引导类
         EventLoopGroup eventLoopGroup = new NioEventLoopGroup();
@@ -50,8 +52,8 @@ public abstract class BaseCommonClient {
                 socketChannel.pipeline().addLast("MessagePack encoder", new MsgpackEncoder());
                 socketChannel.pipeline().addLast("frameDecoder", new LengthFieldBasedFrameDecoder(65535, 0, 2, 0, 2));
                 socketChannel.pipeline().addLast("MessagePack Decoder", new MsgpackDecoder());
-                // 调用自定义的看门狗重连处理类，主要处理正常连接以及异常重连
-//                channelPipeline.addLast(ConnectionWatchDogHandler.createConnectionWatchDogHandler(bootstrap, BaseCommonClient.this));
+                // 调用自定义的看门狗重连处理类，主要处理异常重连
+                channelPipeline.addLast(ConnectionWatchDogHandler.createConnectionWatchDogHandler(bootstrap, BaseCommonClient.this));
                 channelPipeline.addLast(new BussnessHandler());
             }
         });
@@ -71,9 +73,9 @@ public abstract class BaseCommonClient {
                     // 发送消息给配置中心
                     if (remoteTransporterProvider != null) {
                         localChanel.writeAndFlush(remoteTransporterProvider);
-                        System.out.println("注册消息" + remoteTransporterProvider.toString());
+                        log.info("注册消息" + remoteTransporterProvider.toString());
                     }
-                    System.out.println("链路连接成功");
+                    log.info("链路连接成功");
                 } else {
                     future.channel().eventLoop().schedule(new Runnable() {
                         @Override
@@ -81,7 +83,7 @@ public abstract class BaseCommonClient {
                             doConnect();
                         }
                     }, 5, TimeUnit.SECONDS);
-                    System.out.println("正在尝试重连链路中......");
+                    log.info("正在尝试重连链路中......");
                 }
             }
         });

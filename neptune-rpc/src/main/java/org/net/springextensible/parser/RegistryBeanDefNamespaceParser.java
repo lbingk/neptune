@@ -10,7 +10,7 @@ import org.w3c.dom.Element;
 /**
  * @program: neptune
  * @description: 暴露服务的Parser类
- * @author: luobingkai
+ * @author: LUOBINGKAI
  * @create: 2019-11-02 15:23
  */
 public class RegistryBeanDefNamespaceParser implements BeanDefinitionParser {

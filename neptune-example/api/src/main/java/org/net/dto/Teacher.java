@@ -3,7 +3,7 @@ package org.net.dto;
 /**
  * @program: neptune
  * @description:
- * @author: luobingkai
+ * @author: LUOBINGKAI
  * @create: 2019-11-02 18:20
  */
 

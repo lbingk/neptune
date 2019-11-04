@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:rpc="http://www.neptune-rpc.org/schema/neptune-rpc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.neptune-rpc.org/schema/neptune-rpc http://www.neptune-rpc.org/schema/neptune-rpc.xsd">
+
+    <rpc:protocol ip="127.0.0.1" port="21880"/>
+    <rpc:service ref="org.net.impl.TeacherImpl" service="org.net.service.TeacherService"/>
+    <rpc:service ref="org.net.impl.StudentImpl" service="org.net.service.StudentService"/>
+</beans>

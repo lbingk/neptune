@@ -5,7 +5,7 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 /**
  * @program: neptune
  * @description:
- * @author: luobingkai
+ * @author: LUOBINGKAI
  * @create: 2019-11-02 14:51
  */
 public class BeanDefNamespaceHandler extends NamespaceHandlerSupport {
