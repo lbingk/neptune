@@ -8,9 +8,9 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
  * @author: LUOBINGKAI
  * @create: 2019-11-02 14:51
  */
-public class BeanDefNamespaceHandler extends NamespaceHandlerSupport {
+public class BeanDefinitionNamespaceHandler extends NamespaceHandlerSupport {
     @Override
     public void init() {
-        registerBeanDefinitionParser("server", new BeanDefNamespaceParser(RegistrationBeanDef.class));
+        registerBeanDefinitionParser("server", new BeanDefinitionNamespaceParser(RegistrationBeanDefinition.class));
     }
 }

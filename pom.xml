@@ -20,6 +20,7 @@
         <module>neptune-satellite</module>
         <module>neptune-rpc</module>
         <module>neptune-serializable</module>
+        <module>neptune-example</module>
     </modules>
 
     <name>neptune</name>
@@ -38,6 +39,11 @@
             <artifactId>junit</artifactId>
             <version>4.11</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.4</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

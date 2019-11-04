@@ -1,4 +1,4 @@
-package org.net.springextensible.beandef;
+package org.net.springextensible.beandefinition;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -6,18 +6,19 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * @Classname RefBeanDef
+ * @program: neptune
+ * @description:
  * @author: LUOBINGKAI
- * @Description TODO
- * @Date 2019/11/3 18:13
+ * @create: 2019-11-02 15:42
  */
 
 @Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RefBaseBeanDef<T> {
-    private String ref;
+public class RegistryBean {
+    private String ip;
+    private int port;
     private int timeout;
 
 }

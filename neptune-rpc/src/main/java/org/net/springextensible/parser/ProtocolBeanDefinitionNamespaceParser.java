@@ -9,15 +9,15 @@ import org.w3c.dom.Element;
 
 /**
  * @program: neptune
- * @description: 订阅服务的Parser类
+ * @description:
  * @author: LUOBINGKAI
  * @create: 2019-11-02 15:23
  */
-public class RefBeanDefNamespaceParser implements BeanDefinitionParser {
+public class ProtocolBeanDefinitionNamespaceParser implements BeanDefinitionParser {
 
     private Class<?> clz;
 
-    public RefBeanDefNamespaceParser(Class<?> clz) {
+    public ProtocolBeanDefinitionNamespaceParser(Class<?> clz) {
         this.clz = clz;
     }
 
@@ -26,8 +26,8 @@ public class RefBeanDefNamespaceParser implements BeanDefinitionParser {
         RootBeanDefinition beanDef = new RootBeanDefinition();
         beanDef.setBeanClass(clz);
         beanDef.setLazyInit(Boolean.FALSE);
-        beanDef.getPropertyValues().add("interfaceName", element.getAttribute("interface"));
-        beanDef.getPropertyValues().add("timeout", element.getAttribute("timeout"));
+        beanDef.getPropertyValues().add("ip", element.getAttribute("ip"));
+        beanDef.getPropertyValues().add("port", element.getAttribute("port"));
 //        beanDef.getPropertyValues().add("timeout", element.getAttribute("timeout"));
         BeanDefinitionRegistry beanDefRegistry = parserContext.getRegistry();
         beanDefRegistry.registerBeanDefinition(clz.getName(), beanDef);

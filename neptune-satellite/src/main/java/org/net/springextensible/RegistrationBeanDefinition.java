@@ -1,24 +1,19 @@
-package org.net.springextensible.beandef;
+package org.net.springextensible;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * @program: neptune
- * @description:
- * @author: LUOBINGKAI
- * @create: 2019-11-02 15:42
- */
 
+/**
+ * 自定义bean,匹配spi扩展
+ */
 @Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegistryBeanDef {
-    private String ip;
+public class RegistrationBeanDefinition {
     private int port;
     private int timeout;
-
 }

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:rpc="http://www.neptune-rpc.org/schema/neptune-rpc"
+       xmlns:neptune="http://www.neptune-rpc.org/schema/neptune-rpc"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://www.neptune-rpc.org/schema/neptune-rpc http://www.neptune-rpc.org/schema/neptune-rpc.xsd">
 
-    <rpc:ref interface="org.net.service.TeacherService" timeout="121"/>
-    <rpc:ref interface="org.net.service.StudentService" timeout="122"/>
+<neptune:reference interface="org.net.service.TeacherService"/>
+<neptune:reference interface="org.net.service.StudentService"/>
 </beans>

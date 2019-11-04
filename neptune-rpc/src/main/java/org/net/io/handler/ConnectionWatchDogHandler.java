@@ -6,8 +6,6 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.Getter;
 import lombok.Setter;
 import org.net.io.BaseCommonClient;
-import org.net.springextensible.beandef.RegistryBeanDef;
-import org.net.util.SpringContextHolder;
 
 
 /**

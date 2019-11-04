@@ -1,6 +1,9 @@
 package org.net.io.handler;
 
 import io.netty.channel.ChannelHandlerContext;
+import lombok.extern.slf4j.Slf4j;
+import org.msgpack.MessagePack;
+import org.net.transport.RemoteTransporter;
 
 /**
  * @Description 定义处理读的处理
@@ -8,10 +11,14 @@ import io.netty.channel.ChannelHandlerContext;
  * @Date 2019/7/20 3:09
  * @Version 1.0
  **/
+@Slf4j
 public class BussnessHandler extends BaseBussnessHandler {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        RemoteTransporter readTransporter = MessagePack.unpack(MessagePack.pack(msg), RemoteTransporter.class);
+        log.info(readTransporter.toString());
+
     }
 
     @Override

@@ -1,19 +1,22 @@
 package org.net.io.handler;
 
+import com.alibaba.fastjson.JSON;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.handler.timeout.IdleState;
-import io.netty.handler.timeout.IdleStateEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.msgpack.MessagePack;
 import org.net.collection.RegistrationDirectory;
-import org.net.transport.RemoteTransporter;
 import org.net.constant.TransportTypeEnum;
-import org.net.transport.ServiceBeanExport;
-import com.alibaba.fastjson.JSON;
+import org.net.springextensible.RegistrationBeanDefinition;
+import org.net.transport.InvokerBeanExport;
+import org.net.transport.RemoteTransporter;
+import org.net.util.SpringContextHolder;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * @Classname BussnessHandler
@@ -24,44 +27,43 @@ import java.util.List;
 @Slf4j
 public class BussnessHandler extends ChannelInboundHandlerAdapter {
 
-    public static RegistrationDirectory registrationDirectory = RegistrationDirectory.getInstance();
-
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        doParse(msg);
+        doParse(ctx, msg);
     }
 
-    private void doParse(Object msg) throws IOException {
+    private void doParse(ChannelHandlerContext ctx, Object msg) throws IOException {
         RemoteTransporter readTransporter = MessagePack.unpack(MessagePack.pack(msg), RemoteTransporter.class);
-        String ipAddrAndPort = readTransporter.getIpAddrAndPort();
+        String remoteIpAddrAndPort = readTransporter.getIpAddrAndPort();
         log.info(readTransporter.toString());
+        List<InvokerBeanExport> invokerBeanExportList = JSON.parseArray(readTransporter.getTransContent(), InvokerBeanExport.class);
 
         if (TransportTypeEnum.REGISTRY.getType().equals(readTransporter.getTransType())) {
             // 当收到的是服务注册类型
-            List<ServiceBeanExport> serviceBeanExportList = JSON.parseArray(readTransporter.getTransContent(), ServiceBeanExport.class);
-            for (ServiceBeanExport serviceBeanExport : serviceBeanExportList) {
-                String interfaceClassNmae = serviceBeanExport.getInterfaceClass().toString();
-                String jsonString = JSON.toJSONString(serviceBeanExport);
-                registrationDirectory.putServiceBeanInfo(interfaceClassNmae, ipAddrAndPort, jsonString);
+            for (InvokerBeanExport invokerBeanExport : invokerBeanExportList) {
+                String interfaceClassName = invokerBeanExport.getInterfaceClass();
+                String jsonString = JSON.toJSONString(invokerBeanExport);
+                RegistrationDirectory.putInvokerBeanInfo(interfaceClassName, remoteIpAddrAndPort, jsonString);
             }
         }
 
         if (TransportTypeEnum.SUBSCRIBE.getType().equals(readTransporter.getTransType())) {
             // 当收到的是服务订阅类型
-            List<String> transContentList = JSON.parseArray(readTransporter.getTransContent(), String.class);
-            for (String interfaceClassNmae : transContentList) {
-                registrationDirectory.putRefBeanInfo(interfaceClassNmae, ipAddrAndPort);
+            for (InvokerBeanExport invokerBeanExport : invokerBeanExportList) {
+                RegistrationDirectory.putReferenceBeanInfo(invokerBeanExport.getInterfaceClass(), remoteIpAddrAndPort);
+                //返回订阅的结果
+                Map<String, String> directoryMap = RegistrationDirectory.subscribeResult(invokerBeanExport.getInterfaceClass());
+                RegistrationBeanDefinition registrationBeanDefinition = SpringContextHolder.getBean(RegistrationBeanDefinition.class);
+                String localIpAddrAndPort = InetAddress.getLocalHost().getHostAddress() + ":" + registrationBeanDefinition.getPort();
+                RemoteTransporter transporter = RemoteTransporter.create(UUID.randomUUID().toString(), localIpAddrAndPort, JSON.toJSONString(directoryMap), TransportTypeEnum.SUBSCRIBE_RESULT.getType());
+                ctx.writeAndFlush(transporter);
             }
         }
 
-        if (TransportTypeEnum.REGISTRY_HEART_BEAT.getType().equals(readTransporter.getTransType())) {
-            // 当收到的是服务提供者心跳的检测,更新维护心跳时间
-            registrationDirectory.refreshRegistryHostTime(ipAddrAndPort);
+        if (TransportTypeEnum.HEART_BEAT.getType().equals(readTransporter.getTransType())) {
+            // 更新最新的心跳时间
+            RegistrationDirectory.refreshHostTime(remoteIpAddrAndPort);
         }
 
-        if (TransportTypeEnum.SUBSCRIBE_HEART_BEAT.getType().equals(readTransporter.getTransType())) {
-            // 当收到的是服务订阅者心跳的检测,更新维护心跳时间
-            registrationDirectory.refreshSubscribeHostTime(ipAddrAndPort);
-        }
     }
 }

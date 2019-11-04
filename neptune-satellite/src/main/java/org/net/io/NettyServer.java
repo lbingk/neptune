@@ -12,7 +12,7 @@ import org.net.collection.RegistrationDirectory;
 import org.net.handler.MsgpackDecoder;
 import org.net.handler.MsgpackEncoder;
 import org.net.io.handler.BussnessHandler;
-import org.net.springextensible.RegistrationBeanDef;
+import org.net.springextensible.RegistrationBeanDefinition;
 import org.net.util.SpringContextHolder;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -31,7 +31,7 @@ public class NettyServer implements ApplicationListener<ContextRefreshedEvent> {
 
     public void run() {
         // 获取配置的参数：port 以及 timeout
-        RegistrationBeanDef beanDef = SpringContextHolder.getBean(RegistrationBeanDef.class);
+        RegistrationBeanDefinition registrationBeanDefinition = SpringContextHolder.getBean(RegistrationBeanDefinition.class);
         // 创建Boss：作用于客户端的连接
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         // 创建woker：作用于迭代器可用的连接
@@ -54,7 +54,7 @@ public class NettyServer implements ApplicationListener<ContextRefreshedEvent> {
                     }
                 }).option(ChannelOption.SO_BACKLOG, 2048 * 2048 * 2048);
         try {
-            ChannelFuture channelFuture = bootstrap.bind(beanDef.getPort()).sync();
+            ChannelFuture channelFuture = bootstrap.bind(registrationBeanDefinition.getPort()).sync();
         } catch (InterruptedException e) {
             e.printStackTrace();
             // 异常情况优雅关闭

@@ -22,7 +22,7 @@
                     </xsd:choice>
                     <xsd:attribute name="id" type="xsd:ID" />
                     <xsd:attribute name="ref" type="xsd:string" use="required"/>
-                    <xsd:attribute name="service" type="xsd:string" use="required"/>
+                    <xsd:attribute name="interface" type="xsd:string" use="required"/>
                     <xsd:attribute name="group" type="xsd:string" use="optional"/>
                     <xsd:attribute name="registry" type="xsd:string" use="optional"/>
                     <xsd:attribute name="version" type="xsd:string" use="optional"/>
@@ -34,7 +34,7 @@
         </xsd:complexType>
     </xsd:element>
 
-    <xsd:element name="ref">
+    <xsd:element name="reference">
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="abstractConfig">

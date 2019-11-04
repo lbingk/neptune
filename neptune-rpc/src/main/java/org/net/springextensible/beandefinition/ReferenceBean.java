@@ -1,9 +1,9 @@
-package org.net.springextensible.beandef;
+package org.net.springextensible.beandefinition;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.net.collection.RefBeanInfo;
-import org.net.springextensible.factory.RefProxyBeanFactory;
+import org.net.springextensible.invoke.InvokerBeanInfo;
+import org.net.springextensible.invoke.ReferenceProxyBeanFactory;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -15,7 +15,7 @@ import org.springframework.beans.factory.InitializingBean;
  */
 @Setter
 @Getter
-public class RefBeanDef<T> implements FactoryBean, InitializingBean {
+public class ReferenceBean<T> implements FactoryBean, InitializingBean {
     private String interfaceName;
     private int timeout;
     private Class<?> interfaceClass;
@@ -33,20 +33,12 @@ public class RefBeanDef<T> implements FactoryBean, InitializingBean {
     }
 
     private Object get() {
-        ref = RefProxyBeanFactory.createProxy(interfaceClass);
+        ref = ReferenceProxyBeanFactory.createProxy(interfaceClass);
         return ref;
     }
 
     private Class<?> getInterfaceClass() {
-        try {
-            if (interfaceClass == null) {
-                interfaceClass = Class.forName(interfaceName);
-            }
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } finally {
-            return interfaceClass;
-        }
+        return interfaceClass;
     }
 
     @Override
@@ -56,7 +48,7 @@ public class RefBeanDef<T> implements FactoryBean, InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        RefBeanInfo.getSingleton().addRefBeanDefinationClassName(interfaceName);
-//        this.getObject();
+        interfaceClass = Class.forName(interfaceName);
+        InvokerBeanInfo.addInvokerBeanExport(interfaceClass);
     }
 }

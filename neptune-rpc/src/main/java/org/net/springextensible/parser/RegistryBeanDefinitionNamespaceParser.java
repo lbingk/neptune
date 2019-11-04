@@ -13,11 +13,11 @@ import org.w3c.dom.Element;
  * @author: LUOBINGKAI
  * @create: 2019-11-02 15:23
  */
-public class RegistryBeanDefNamespaceParser implements BeanDefinitionParser {
+public class RegistryBeanDefinitionNamespaceParser implements BeanDefinitionParser {
 
     private Class<?> clz;
 
-    public RegistryBeanDefNamespaceParser(Class<?> clz) {
+    public RegistryBeanDefinitionNamespaceParser(Class<?> clz) {
         this.clz = clz;
     }
 

@@ -9,7 +9,7 @@ import org.net.service.TeacherService;
  * @author: LUOBINGKAI
  * @create: 2019-11-02 18:26
  */
-public class TeacherImpl implements TeacherService {
+public class TeacherServiceImpl implements TeacherService {
     @Override
     public Teacher getTeacher(Integer id) {
         return new Teacher(1, "xxooxxoo");

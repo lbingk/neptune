@@ -1,11 +1,18 @@
 package org.net.collection;
 
 import lombok.extern.slf4j.Slf4j;
-import org.net.springextensible.RegistrationBeanDef;
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
+import org.net.springextensible.RegistrationBeanDefinition;
 import org.net.util.SpringContextHolder;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Classname RegistrationDirectory
@@ -16,24 +23,19 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class RegistrationDirectory {
 
-    private static RegistrationDirectory instance = new RegistrationDirectory();
-
     private RegistrationDirectory() {
     }
 
-    public static RegistrationDirectory getInstance() {
-        return instance;
-    }
 
     /**
      * 用 ConcurrentHashMap 来装载对应的注册服务:key值为暴露的服务
      **/
-    public static Map<String, Map<String, String>> serviceBeanInfonMap = new ConcurrentHashMap<>();
+    public static Map<String, Map<String, String>> serviceBeanInfoMap = new ConcurrentHashMap<>();
 
     /**
      * 用 ConcurrentHashMap 来装载对应的订阅服务:key值为需要订阅的服务
      **/
-    public static Map<String, Set<String>> refBeanInfoMap = new ConcurrentHashMap<>();
+    public static Map<String, Set<String>> referenceBeanInfoMap = new ConcurrentHashMap<>();
 
     /**
      * 用 ConcurrentHashMap 来装载对应的注册服务机器心跳连接时的时间
@@ -51,8 +53,8 @@ public class RegistrationDirectory {
      * @param interfaceName
      * @param serviceBeanInfoStr
      */
-    public void putServiceBeanInfo(String interfaceName, String ipAddrAndPort, String serviceBeanInfoStr) {
-        Map<String, String> serviceProviderMap = serviceBeanInfonMap.get(interfaceName);
+    public static void putInvokerBeanInfo(String interfaceName, String ipAddrAndPort, String serviceBeanInfoStr) {
+        Map<String, String> serviceProviderMap = serviceBeanInfoMap.get(interfaceName);
         if (serviceProviderMap == null) {
             // 新增的interfaceName,直接添加
             serviceProviderMap = new ConcurrentHashMap<>();
@@ -61,25 +63,51 @@ public class RegistrationDirectory {
             // 新增的ipAddrAndPort
             serviceProviderMap.put(ipAddrAndPort, serviceBeanInfoStr);
         }
-        serviceBeanInfonMap.put(interfaceName, serviceProviderMap);
+        serviceBeanInfoMap.put(interfaceName, serviceProviderMap);
+        registryHostTimeMap.put(ipAddrAndPort, System.currentTimeMillis());
+    }
+
+    /**
+     * 返回订阅的结果
+     *
+     * @param interfaceName
+     * @return
+     */
+    public static Map<String, String> subscribeResult(String interfaceName) {
+        return serviceBeanInfoMap.get(interfaceName);
+    }
+
+
+    /**
+     * 刷新记录心跳时间
+     *
+     * @param ipAddrAndPort
+     */
+    public static void refreshHostTime(String ipAddrAndPort) {
+        refreshRegistryHostTime(ipAddrAndPort);
+        refreshSubscribeHostTime(ipAddrAndPort);
     }
 
     /**
      * 刷新记录注册心跳时间
      *
-     * @param ipAddr
+     * @param ipAddrAndPort
      */
-    public void refreshRegistryHostTime(String ipAddr) {
-        registryHostTimeMap.put(ipAddr, System.currentTimeMillis());
+    private static void refreshRegistryHostTime(String ipAddrAndPort) {
+        if (registryHostTimeMap.containsKey(ipAddrAndPort)) {
+            registryHostTimeMap.put(ipAddrAndPort, System.currentTimeMillis());
+        }
     }
 
     /**
      * 刷新记录订阅心跳时间
      *
-     * @param ipAddr
+     * @param ipAddrAndPort
      */
-    public void refreshSubscribeHostTime(String ipAddr) {
-        subscribeHostTimeMap.put(ipAddr, System.currentTimeMillis());
+    private static void refreshSubscribeHostTime(String ipAddrAndPort) {
+        if (subscribeHostTimeMap.containsKey(ipAddrAndPort)) {
+            subscribeHostTimeMap.put(ipAddrAndPort, System.currentTimeMillis());
+        }
     }
 
 
@@ -87,15 +115,16 @@ public class RegistrationDirectory {
      * 自动刷新连接情况好的注册地址列表:50刷新一次
      */
     public static void refreshBeanInfonMap() {
-        final int timeout = SpringContextHolder.getBean(RegistrationBeanDef.class).getTimeout();
-        Timer t = new Timer();
-        t.scheduleAtFixedRate(new TimerTask() {
+        final int timeout = SpringContextHolder.getBean(RegistrationBeanDefinition.class).getTimeout();
+        ScheduledExecutorService executorService = new ScheduledThreadPoolExecutor(1,
+                new BasicThreadFactory.Builder().namingPattern("example-schedule-pool-%d").daemon(true).build());
+        executorService.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
                 doRefreshRegistryHostTimeMap(timeout);
                 doRefreshSubscribeHostTimeMap(timeout);
             }
-        }, 0, 5 * 10 * 1000);
+        }, 5, 5 * 10 * 1000, TimeUnit.HOURS);
     }
 
     private static void doRefreshSubscribeHostTimeMap(int timeout) {
@@ -128,15 +157,15 @@ public class RegistrationDirectory {
      * 提供订阅地址存储
      *
      * @param interfaceName
-     * @param ipAddr
+     * @param ipAddrAndPort
      */
-    public static void putRefBeanInfo(String interfaceName, String ipAddr) {
-        if (refBeanInfoMap.containsKey(interfaceName)) {
-            refBeanInfoMap.get(interfaceName).add(ipAddr);
+    public static void putReferenceBeanInfo(String interfaceName, String ipAddrAndPort) {
+        if (referenceBeanInfoMap.containsKey(interfaceName)) {
+            referenceBeanInfoMap.get(interfaceName).add(ipAddrAndPort);
         } else {
-            Set<String> ipAddrList = new HashSet<>();
-            ipAddrList.add(ipAddr);
-            refBeanInfoMap.put(interfaceName, ipAddrList);
+            Set<String> ipAddrAndPortList = new HashSet<>();
+            ipAddrAndPortList.add(ipAddrAndPort);
+            referenceBeanInfoMap.put(interfaceName, ipAddrAndPortList);
         }
     }
 }

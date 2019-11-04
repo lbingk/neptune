@@ -8,13 +8,9 @@ package org.net.constant;
  */
 public enum TransportTypeEnum {
     /**
-     * 服务心跳检测
+     * 心跳检测
      */
-    REGISTRY_HEART_BEAT(0, "心跳检测"),
-    /**
-     * 订阅心跳检测
-     */
-    SUBSCRIBE_HEART_BEAT(1, "心跳检测"),
+    HEART_BEAT(0, "心跳检测"),
     /**
      * 服务注册
      */
@@ -23,6 +19,10 @@ public enum TransportTypeEnum {
      * 服务订阅
      */
     SUBSCRIBE(20, "服务订阅"),
+    /**
+     * 服务订阅结果
+     */
+    SUBSCRIBE_RESULT(30, "服务订阅结果"),
     ;
 
 

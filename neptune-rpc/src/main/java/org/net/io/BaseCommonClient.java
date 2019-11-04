@@ -9,12 +9,12 @@ import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.timeout.IdleStateHandler;
 import lombok.extern.slf4j.Slf4j;
-import org.net.transport.RemoteTransporter;
 import org.net.handler.MsgpackDecoder;
 import org.net.handler.MsgpackEncoder;
 import org.net.io.handler.BussnessHandler;
 import org.net.io.handler.ConnectionWatchDogHandler;
-import org.net.springextensible.beandef.RegistryBeanDef;
+import org.net.springextensible.beandefinition.RegistryBean;
+import org.net.transport.RemoteTransporter;
 
 import java.util.concurrent.TimeUnit;
 
@@ -28,13 +28,13 @@ import java.util.concurrent.TimeUnit;
 public abstract class BaseCommonClient {
     private Bootstrap bootstrap = null;
     private Channel channel = null;
-    private RemoteTransporter remoteTransporterProvider = null;
-    private RegistryBeanDef registryBeanDefination = null;
+    private RemoteTransporter remoteTransporter = null;
+    private RegistryBean registryBean = null;
 
-    public void run(RemoteTransporter remoteTransporterProvider, RegistryBeanDef registryBeanDefination) {
+    public void run(RemoteTransporter remoteTransporter, RegistryBean registryBean) {
 
-        this.remoteTransporterProvider = remoteTransporterProvider;
-        this.registryBeanDefination = registryBeanDefination;
+        this.remoteTransporter = remoteTransporter;
+        this.registryBean = registryBean;
 
         // 配置 netty 的启动引导类
         EventLoopGroup eventLoopGroup = new NioEventLoopGroup();
@@ -64,16 +64,15 @@ public abstract class BaseCommonClient {
         if (channel != null && channel.isActive()) {
             return;
         }
-        ChannelFuture channelFuture = bootstrap.connect(registryBeanDefination.getIp(), registryBeanDefination.getPort());
+        ChannelFuture channelFuture = bootstrap.connect(registryBean.getIp(), registryBean.getPort());
         channelFuture.addListener(new ChannelFutureListener() {
             @Override
             public void operationComplete(ChannelFuture future) throws Exception {
                 if (future.isSuccess()) {
                     Channel localChanel = future.channel();
-                    // 发送消息给配置中心
-                    if (remoteTransporterProvider != null) {
-                        localChanel.writeAndFlush(remoteTransporterProvider);
-                        log.info("注册消息" + remoteTransporterProvider.toString());
+                    if (remoteTransporter != null) {
+                        localChanel.writeAndFlush(remoteTransporter);
+                        log.info("消息类型：[{}]" , remoteTransporter.getTransType());
                     }
                     log.info("链路连接成功");
                 } else {

@@ -2,21 +2,16 @@ package org.net.io;
 
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
-import org.net.collection.RefBeanInfo;
-import org.net.collection.ServiceBeanInfo;
+import org.net.springextensible.invoke.InvokerBeanInfo;
 import org.net.constant.TransportTypeEnum;
-import org.net.springextensible.beandef.ProtocolBeanDef;
-import org.net.springextensible.beandef.RegistryBeanDef;
+import org.net.springextensible.beandefinition.ProtocolBean;
+import org.net.springextensible.beandefinition.RegistryBean;
 import org.net.transport.RemoteTransporter;
-import org.net.transport.ServiceBeanExport;
 import org.net.util.SpringContextHolder;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -30,5 +25,10 @@ import java.util.UUID;
 public class SubscribeNettyClient extends BaseCommonClient implements ApplicationListener<ContextRefreshedEvent> {
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
+        ProtocolBean protocolBeanDef = SpringContextHolder.getBean(ProtocolBean.class);
+        String ipAddsAndPort = protocolBeanDef.getIp() + ":" + protocolBeanDef.getPort();
+        String transportContent = JSON.toJSONString(InvokerBeanInfo.getInvokerBeanExportList());
+        RemoteTransporter transporter = RemoteTransporter.create(UUID.randomUUID().toString(), ipAddsAndPort, transportContent, TransportTypeEnum.SUBSCRIBE.getType());
+        super.run(transporter, SpringContextHolder.getBean(RegistryBean.class));
     }
 }
