@@ -1,5 +1,7 @@
 package org.net.invoke;
 
+import org.net.springextensible.beandefinition.ReferenceBean;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -11,8 +13,8 @@ import java.lang.reflect.Proxy;
  * @Date 2019/11/3 18:11
  */
 public class ReferenceProxyBeanFactory {
-    public static <T> T createProxy(Class<?> interfaceClass) {
-        return (T) Proxy.newProxyInstance(ReferenceProxyBeanFactory.class.getClassLoader(), new Class<?>[]{interfaceClass}, new ReferenceProxyBean(new Invoker(interfaceClass)));
+    public static <T> T createProxy(ReferenceBean<T> referenceBean) {
+        return (T) Proxy.newProxyInstance(ReferenceProxyBeanFactory.class.getClassLoader(), new Class<?>[]{referenceBean.getInterfaceClass()}, new ReferenceProxyBean(new Invoker(referenceBean)));
     }
 
     static class ReferenceProxyBean<T> implements InvocationHandler {

@@ -33,11 +33,11 @@ public class ReferenceBean<T> implements FactoryBean, InitializingBean {
     }
 
     private Object get() {
-        ref = ReferenceProxyBeanFactory.createProxy(interfaceClass);
+        ref = ReferenceProxyBeanFactory.createProxy(this);
         return ref;
     }
 
-    private Class<?> getInterfaceClass() {
+    public Class<?> getInterfaceClass() {
         return interfaceClass;
     }
 

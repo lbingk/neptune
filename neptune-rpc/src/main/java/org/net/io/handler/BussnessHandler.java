@@ -5,7 +5,9 @@ import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.msgpack.MessagePack;
 import org.net.constant.TransportTypeEnum;
+import org.net.io.reference.DefaultFuture;
 import org.net.io.reference.InvokerDirectory;
+import org.net.io.reference.Response;
 import org.net.transport.InvokerBeanExport;
 import org.net.transport.RemoteTransporter;
 
@@ -29,9 +31,19 @@ public class BussnessHandler extends BaseBussnessHandler {
             //返回的订阅的地址列表信息
             List<InvokerBeanExport> invokerBeanExportList = JSON.parseArray(readTransporter.getTransContent(), InvokerBeanExport.class);
             for (InvokerBeanExport invokerBeanExport : invokerBeanExportList) {
-                InvokerDirectory.addInvoker(invokerBeanExport.getInterfaceClass(),ipAddrAndPort);
+                InvokerDirectory.addInvoker(invokerBeanExport.getInterfaceClass(), ipAddrAndPort);
             }
         }
+
+        if (TransportTypeEnum.INVOKER_RESULT.getType().equals(readTransporter.getTransType())) {
+            //返回的远程调用的结果
+            Response response = JSON.parseObject(readTransporter.getTransContent(), Response.class);
+            DefaultFuture defaultFuture = DefaultFuture.defaultFutureMap.get(response.getMid());
+            if (defaultFuture != null) {
+                defaultFuture.setResponse(response);
+            }
+        }
+
         log.info(readTransporter.toString());
     }
 

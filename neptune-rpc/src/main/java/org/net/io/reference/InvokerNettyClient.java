@@ -12,10 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.net.handler.MsgpackDecoder;
 import org.net.handler.MsgpackEncoder;
 import org.net.io.handler.BussnessHandler;
-import org.net.transport.RemoteTransporter;
-import org.springframework.util.StringUtils;
-
-import java.lang.reflect.Method;
 
 /**
  * @program: neptune
@@ -26,9 +22,7 @@ import java.lang.reflect.Method;
 @Slf4j
 public class InvokerNettyClient {
 
-    private static Bootstrap bootstrap = null;
-    private Channel channel = null;
-    private RemoteTransporter remoteTransporter = null;
+    private static Bootstrap bootstrap;
 
     static {
         EventLoopGroup eventLoopGroup = new NioEventLoopGroup();
@@ -50,22 +44,17 @@ public class InvokerNettyClient {
     }
 
     /**
-     * netty远程调用客户端
+     * 建立连接，发送请求
      *
-     * @param interfaceClass
-     * @param method
-     * @param args
+     * @param request
+     * @param ipAddrAndPorts
+     * @param timeout
      * @return
+     * @throws Exception
      */
-    public void invoke(Class<?> interfaceClass, Method method, Object[] args) throws Exception {
-        String invokerDirectory = InvokerDirectory.getRandom(interfaceClass.getName());
-        if (StringUtils.isEmpty(invokerDirectory)) {
-            throw new Exception("不存在此服务提供者：" + interfaceClass);
-        }
-        String[] ipAddrAndPorts = StringUtils.split(invokerDirectory, ":");
+    public static Object invoke(Request request, String[] ipAddrAndPorts, int timeout) throws Exception {
         ChannelFuture channelFuture = bootstrap.connect(ipAddrAndPorts[0], Integer.parseInt(ipAddrAndPorts[1]));
-
-
-        method.invoke(interfaceClass, args);
+        channelFuture.channel().writeAndFlush(request);
+        return new DefaultFuture(request).get(timeout);
     }
 }

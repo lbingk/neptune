@@ -23,6 +23,11 @@ public enum TransportTypeEnum {
      * 服务订阅结果
      */
     SUBSCRIBE_RESULT(30, "服务订阅结果"),
+
+    /**
+     * 服务调用返回结果
+     */
+    INVOKER_RESULT(40, "服务调用返回结果"),
     ;
 
 
