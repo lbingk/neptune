@@ -1,9 +1,15 @@
 package org.net.io.handler;
 
+import com.alibaba.fastjson.JSON;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.msgpack.MessagePack;
+import org.net.constant.TransportTypeEnum;
+import org.net.io.reference.InvokerDirectory;
+import org.net.transport.InvokerBeanExport;
 import org.net.transport.RemoteTransporter;
+
+import java.util.List;
 
 /**
  * @Description 定义处理读的处理
@@ -17,8 +23,16 @@ public class BussnessHandler extends BaseBussnessHandler {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         RemoteTransporter readTransporter = MessagePack.unpack(MessagePack.pack(msg), RemoteTransporter.class);
-        log.info(readTransporter.toString());
+        String ipAddrAndPort = readTransporter.getIpAddrAndPort();
 
+        if (TransportTypeEnum.SUBSCRIBE_RESULT.getType().equals(readTransporter.getTransType())) {
+            //返回的订阅的地址列表信息
+            List<InvokerBeanExport> invokerBeanExportList = JSON.parseArray(readTransporter.getTransContent(), InvokerBeanExport.class);
+            for (InvokerBeanExport invokerBeanExport : invokerBeanExportList) {
+                InvokerDirectory.addInvoker(invokerBeanExport.getInterfaceClass(),ipAddrAndPort);
+            }
+        }
+        log.info(readTransporter.toString());
     }
 
     @Override

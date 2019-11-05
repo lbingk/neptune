@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.net.springextensible.invoke.InvokerBeanInfo;
+import org.net.invoke.InvokerBeanInfo;
 import org.springframework.beans.factory.InitializingBean;
 
 /**

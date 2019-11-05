@@ -2,8 +2,8 @@ package org.net.springextensible.beandefinition;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.net.springextensible.invoke.InvokerBeanInfo;
-import org.net.springextensible.invoke.ReferenceProxyBeanFactory;
+import org.net.invoke.InvokerBeanInfo;
+import org.net.invoke.ReferenceProxyBeanFactory;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 

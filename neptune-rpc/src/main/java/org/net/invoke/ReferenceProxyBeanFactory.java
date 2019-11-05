@@ -1,4 +1,4 @@
-package org.net.springextensible.invoke;
+package org.net.invoke;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

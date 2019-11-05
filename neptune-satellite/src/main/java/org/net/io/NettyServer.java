@@ -8,7 +8,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.timeout.IdleStateHandler;
-import org.net.collection.RegistrationDirectory;
+import org.net.manager.RegistrationDirectory;
 import org.net.handler.MsgpackDecoder;
 import org.net.handler.MsgpackEncoder;
 import org.net.io.handler.BussnessHandler;
@@ -66,6 +66,6 @@ public class NettyServer implements ApplicationListener<ContextRefreshedEvent> {
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
         this.run();
-        RegistrationDirectory.refreshBeanInfonMap();
+        RegistrationDirectory.refreshBeanInfoMap();
     }
 }

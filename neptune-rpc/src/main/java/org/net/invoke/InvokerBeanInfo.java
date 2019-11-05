@@ -1,4 +1,4 @@
-package org.net.springextensible.invoke;
+package org.net.invoke;
 
 import org.net.transport.InvokerBeanExport;
 
