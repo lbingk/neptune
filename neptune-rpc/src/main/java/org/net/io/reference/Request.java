@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * @program: neptune
  * @description:
- * @author: luobingkai
+ * @author: LUOBINGKAI
  * @create: 2019-11-05 20:06
  */
 @Setter

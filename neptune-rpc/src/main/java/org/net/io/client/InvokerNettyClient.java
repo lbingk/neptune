@@ -24,6 +24,18 @@ import java.util.concurrent.TimeUnit;
 public class InvokerNettyClient {
 
     private Bootstrap bootstrap;
+    private int timeout;
+    private int retries;
+    private String invokerDirectory;
+    private Request request;
+
+    public InvokerNettyClient(Request request, String invokerDirectory, int timeout, int retries) {
+        this.request = request;
+        this.invokerDirectory = invokerDirectory;
+        this.timeout = timeout;
+        this.retries = retries;
+    }
+
 
     /**
      * 为每一个连接客户端创建 Bootstrap 启动类
@@ -39,12 +51,8 @@ public class InvokerNettyClient {
 
     /**
      * 创建连接通道，在原来的 NettyChannel.CHANNEL_MAP 不存在连接通道的时候，按照配置的重试次数以及超时时间重试
-     *
-     * @param invokerDirectory
-     * @param timeout
-     * @param retries
      */
-    public Channel dcConnect(final String invokerDirectory, final int timeout, final int retries) {
+    public Channel dcConnect() throws Exception {
         // 获取旧的 channel
         Channel oldChannel = NettyChannel.CHANNEL_MAP.get(invokerDirectory);
         if (oldChannel == null || !oldChannel.isActive()) {
@@ -57,22 +65,23 @@ public class InvokerNettyClient {
             final ChannelFuture channelFuture = bootstrap.connect(ipAddrAndPorts[0], Integer.parseInt(ipAddrAndPorts[1]));
             channelFuture.addListener(new InvokerChannelFutureListener(channelFuture, invokerDirectory, timeout, retries, currentRetries));
         }
-        return NettyChannel.CHANNEL_MAP.get(invokerDirectory);
+        Channel nowChannel = NettyChannel.CHANNEL_MAP.get(invokerDirectory);
+        if (nowChannel == null || !nowChannel.isActive()) {
+            throw new Exception(getErrorMsg());
+        }
+        return nowChannel;
     }
 
     /**
      * 发送请求
      *
-     * @param request
      * @param channel
-     * @param timeout
-     * @param retries
      * @return
      * @throws Exception
      */
-    public Object doSend(Request request, Channel channel, final int timeout, final int retries) throws Exception {
+    public Object doSend(Channel channel) throws Exception {
         channel.writeAndFlush(request);
-        return new DefaultFuture(request,channel).get(timeout);
+        return new DefaultFuture(request, channel).get(timeout);
     }
 
 
@@ -106,15 +115,28 @@ public class InvokerNettyClient {
                     @Override
                     public void run() {
                         if (currentRetries[0] > retries) {
-                            log.error("连接不正常，并超出设定的超时范围以及重试次数" + invokerDirectory + "，" + timeout + "，" + retries);
+                            log.error(getErrorMsg());
                             channelFuture.cancel(true);
                         }
                         currentRetries[0]++;
-                        dcConnect(invokerDirectory, timeout, retries);
+                        try {
+                            dcConnect();
+                        } catch (Exception e) {
+                            log.error(e.getStackTrace().toString());
+                        }
                     }
                 }, timeout, TimeUnit.SECONDS);
             }
         }
+    }
+
+    /**
+     * 返回错误信息
+     *
+     * @return
+     */
+    private String getErrorMsg() {
+        return "连接不正常，并超出设定的超时范围以及重试次数" + invokerDirectory + "，" + timeout + "，" + retries;
     }
 
 }

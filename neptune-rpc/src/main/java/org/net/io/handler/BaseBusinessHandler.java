@@ -13,14 +13,15 @@ import org.net.util.SpringContextHolder;
 import java.util.UUID;
 
 /**
- * @Description 定义处理chanel激活时的处理逻辑
- * @Author LUOBINGKAI
- * @Date 2019/7/20 3:09
- * @Version 1.0
- **/
+ * @program: neptune
+ * @description: 处理具体的业务交接
+ * @author: LUOBINGKAI
+ * @create: 2019-11-06 10:43
+ */
 @Slf4j
 public class BaseBusinessHandler extends ChannelInboundHandlerAdapter {
     private static final String ipAddrAndPort;
+
     static {
         ProtocolBean protocolBean = SpringContextHolder.getBean(ProtocolBean.class);
         ipAddrAndPort = protocolBean.getIp() + ":" + protocolBean.getPort();

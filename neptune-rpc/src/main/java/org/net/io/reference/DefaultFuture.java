@@ -19,7 +19,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * @program: neptune
  * @description: 处理消费端并发访问以及超时问题
- * @author: luobingkai
+ * @author: LUOBINGKAI
  * @create: 2019-11-05 19:58
  */
 @Setter

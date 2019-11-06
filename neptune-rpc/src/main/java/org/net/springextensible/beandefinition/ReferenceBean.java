@@ -18,6 +18,7 @@ import org.springframework.beans.factory.InitializingBean;
 public class ReferenceBean<T> implements FactoryBean, InitializingBean {
     private String interfaceName;
     private int timeout;
+    private int reties;
     private Class<?> interfaceClass;
     private Boolean init;
     private T ref;

@@ -12,7 +12,7 @@ import org.net.handler.MsgpackEncoder;
 /**
  * @program: neptune
  * @description: 处理消费端与服务端的通讯交接
- * @author: luobingkai
+ * @author: LUOBINGKAI
  * @create: 2019-11-06 10:32
  */
 @Slf4j

@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @program: neptune
  * @description: 管理 Channel
- * @author: luobingkai
+ * @author: LUOBINGKAI
  * @create: 2019-11-06 10:56
  */
 @Slf4j
