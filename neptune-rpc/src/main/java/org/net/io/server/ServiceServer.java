@@ -1,25 +1,20 @@
 package org.net.io.server;
 
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelInitializer;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
-import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
-import io.netty.handler.codec.LengthFieldPrepender;
-import io.netty.handler.timeout.IdleStateHandler;
-import org.net.handler.MsgpackDecoder;
-import org.net.handler.MsgpackEncoder;
+import org.net.io.handler.ProviderHandler;
 import org.net.springextensible.beandefinition.ProtocolBean;
 import org.net.util.SpringContextHolder;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
-import java.util.concurrent.TimeUnit;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @program: neptune
@@ -29,43 +24,47 @@ import java.util.concurrent.TimeUnit;
  */
 @Component
 public class ServiceServer implements ApplicationListener<ContextRefreshedEvent> {
+    public static ProtocolBean protocolBean = null;
+    public static ServerBootstrap bootstrap;
+    public static EventLoopGroup bossGroup;
+    public static EventLoopGroup workerGroup;
+    /**
+     * <IP:PORT,CHANNEL>
+     */
+    public static final Map<String, Channel> CHANNEL_MAP = new ConcurrentHashMap<>();
 
-    public void run() {
-        // 获取配置的参数：port 以及 timeout
-        ProtocolBean protocolBean = SpringContextHolder.getBean(ProtocolBean.class);
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
+        doConnect();
+        doOpen();
+    }
+
+    /**
+     * 创建启动类：ServerBootstrap
+     */
+    private void doOpen() {
+        protocolBean = SpringContextHolder.getBean(ProtocolBean.class);
         // 创建Boss：作用于客户端的连接
-        EventLoopGroup bossGroup = new NioEventLoopGroup();
+        bossGroup = new NioEventLoopGroup();
         // 创建woker：作用于迭代器可用的连接
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
+        workerGroup = new NioEventLoopGroup();
         // 创建 ServerBootstrap：启动类
-        ServerBootstrap bootstrap = new ServerBootstrap();
+        bootstrap = new ServerBootstrap();
         // 配置参数
         bootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class).
-                childHandler(new ChannelInitializer<SocketChannel>() {
-                    @Override
-                    protected void initChannel(SocketChannel socketChannel) throws Exception {
-                        // 解码，编码以及业务逻辑处理链，10秒没有发生写事件，就触发userEventTriggered
-                        ChannelPipeline pipeline = socketChannel.pipeline();
-                        socketChannel.pipeline().addLast(new IdleStateHandler(0, 10, 0, TimeUnit.SECONDS));
-                        socketChannel.pipeline().addLast("frameDecoder", new LengthFieldBasedFrameDecoder(65535, 0, 2, 0, 2));
-                        socketChannel.pipeline().addLast("MessagePack Decoder", new MsgpackDecoder());
-                        socketChannel.pipeline().addLast("frameEncoder", new LengthFieldPrepender(2));
-                        socketChannel.pipeline().addLast("MessagePack encoder", new MsgpackEncoder());
-                    }
-                }).option(ChannelOption.SO_BACKLOG, 2048 * 2048 * 2048);
+                childHandler(new ProviderHandler()).option(ChannelOption.SO_BACKLOG, 2048 * 2048 * 2048);
+    }
+
+    /**
+     * 打开连接端口
+     */
+    private void doConnect() {
         try {
             bootstrap.bind(protocolBean.getPort()).sync();
         } catch (InterruptedException e) {
             e.printStackTrace();
-            // 异常情况优雅关闭
             workerGroup.shutdownGracefully();
             bossGroup.shutdownGracefully();
         }
-    }
-
-
-    @Override
-    public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
-      this.run();
     }
 }

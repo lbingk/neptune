@@ -23,8 +23,20 @@ public class Response implements Serializable {
      * 服务端时间调用过长
      */
     public static final byte SERVER_TIMEOUT = 30;
+    /**
+     * 不存在此服务提供者
+     */
+    public static final byte NO_SERVER = 40;
+    /**
+     * 服务提供者不存在此方法
+     */
+    public static final byte NO_METHOD = 50;
+    /**
+     * 服务提供者抛出异常
+     */
+    public static final byte EXPTION = 60;
 
-    public Object content;
+    public Object content = new Object();
 
     public String errorMessage;
 

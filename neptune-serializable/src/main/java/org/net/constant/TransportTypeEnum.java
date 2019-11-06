@@ -28,6 +28,10 @@ public enum TransportTypeEnum {
      * 服务调用返回结果
      */
     INVOKER_RESULT(40, "服务调用返回结果"),
+    /**
+     * 服务调用
+     */
+    INVOKER(50, "服务调用"),
     ;
 
 

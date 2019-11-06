@@ -1,9 +1,12 @@
 package org.net.invoke;
 
+import org.net.springextensible.beandefinition.ServiceBean;
 import org.net.transport.InvokerBeanExport;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @Classname InvokerBeanInfo
@@ -25,4 +28,11 @@ public class InvokerBeanInfo {
     public static void addInvokerBeanExport(Class<?> interfaceClass) {
         invokerBeanExportList.add(new InvokerBeanExport(interfaceClass));
     }
+
+    private static Map<Class<?>, ServiceBean<?>> classServiceBeanMap = new ConcurrentHashMap<>();
+
+    public static ServiceBean getServiceBean(Class<?> interfaceClass) {
+        return classServiceBeanMap.get(interfaceClass);
+    }
+
 }
