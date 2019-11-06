@@ -19,7 +19,7 @@ import java.util.UUID;
  * @Version 1.0
  **/
 @Slf4j
-public class BaseBussnessHandler extends ChannelInboundHandlerAdapter {
+public class BaseBusinessHandler extends ChannelInboundHandlerAdapter {
     private static final String ipAddrAndPort;
     static {
         ProtocolBean protocolBean = SpringContextHolder.getBean(ProtocolBean.class);
@@ -40,12 +40,12 @@ public class BaseBussnessHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        log.info("BussnessHandler channelInactive");
+        log.info("BusinessHandler channelInactive");
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        log.info("BussnessHandler channelActive");
+        log.info("BusinessHandler channelActive");
         ctx.fireChannelActive();
     }
 

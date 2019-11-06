@@ -1,4 +1,4 @@
-package org.net.io.reference;
+package org.net.io.common;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -14,15 +14,13 @@ import java.io.Serializable;
 @Setter
 @Getter
 public class Response implements Serializable {
-
-
     /**
-     * ok.
+     * Ok
      */
     public static final byte OK = 20;
 
     /**
-     * SERVER side timeout.
+     * 服务端时间调用过长
      */
     public static final byte SERVER_TIMEOUT = 30;
 

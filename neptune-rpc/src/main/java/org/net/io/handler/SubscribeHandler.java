@@ -7,11 +7,9 @@ import org.msgpack.MessagePack;
 import org.net.constant.TransportTypeEnum;
 import org.net.io.reference.DefaultFuture;
 import org.net.io.reference.InvokerDirectory;
-import org.net.io.reference.Response;
+import org.net.io.common.Response;
 import org.net.transport.InvokerBeanExport;
 import org.net.transport.RemoteTransporter;
-
-import java.util.List;
 
 /**
  * @Description 定义处理读的处理
@@ -20,7 +18,7 @@ import java.util.List;
  * @Version 1.0
  **/
 @Slf4j
-public class BussnessHandler extends BaseBussnessHandler {
+public class SubscribeHandler extends BaseBusinessHandler {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
@@ -29,16 +27,14 @@ public class BussnessHandler extends BaseBussnessHandler {
 
         if (TransportTypeEnum.SUBSCRIBE_RESULT.getType().equals(readTransporter.getTransType())) {
             //返回的订阅的地址列表信息
-            List<InvokerBeanExport> invokerBeanExportList = JSON.parseArray(readTransporter.getTransContent(), InvokerBeanExport.class);
-            for (InvokerBeanExport invokerBeanExport : invokerBeanExportList) {
-                InvokerDirectory.addInvoker(invokerBeanExport.getInterfaceClass(), ipAddrAndPort);
-            }
+            InvokerBeanExport invokerBeanExport = JSON.parseObject(readTransporter.getTransContent(), InvokerBeanExport.class);
+            InvokerDirectory.addInvoker(invokerBeanExport.getInterfaceClass(), ipAddrAndPort);
         }
 
         if (TransportTypeEnum.INVOKER_RESULT.getType().equals(readTransporter.getTransType())) {
             //返回的远程调用的结果
             Response response = JSON.parseObject(readTransporter.getTransContent(), Response.class);
-            DefaultFuture defaultFuture = DefaultFuture.defaultFutureMap.get(response.getMid());
+            DefaultFuture defaultFuture = DefaultFuture.DEFAULT_FUTURE_MAP.get(response.getMid());
             if (defaultFuture != null) {
                 defaultFuture.setResponse(response);
             }

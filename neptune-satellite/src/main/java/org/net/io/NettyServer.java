@@ -11,7 +11,7 @@ import io.netty.handler.timeout.IdleStateHandler;
 import org.net.manager.RegistrationDirectory;
 import org.net.handler.MsgpackDecoder;
 import org.net.handler.MsgpackEncoder;
-import org.net.io.handler.BussnessHandler;
+import org.net.io.handler.BusinessHandler;
 import org.net.springextensible.RegistrationBeanDefinition;
 import org.net.util.SpringContextHolder;
 import org.springframework.context.ApplicationListener;
@@ -50,7 +50,7 @@ public class NettyServer implements ApplicationListener<ContextRefreshedEvent> {
                         socketChannel.pipeline().addLast("MessagePack Decoder", new MsgpackDecoder());
                         socketChannel.pipeline().addLast("frameEncoder", new LengthFieldPrepender(2));
                         socketChannel.pipeline().addLast("MessagePack encoder", new MsgpackEncoder());
-                        pipeline.addLast(new BussnessHandler());
+                        pipeline.addLast(new BusinessHandler());
                     }
                 }).option(ChannelOption.SO_BACKLOG, 2048 * 2048 * 2048);
         try {

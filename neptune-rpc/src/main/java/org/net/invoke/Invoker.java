@@ -2,7 +2,7 @@ package org.net.invoke;
 
 import lombok.*;
 import org.net.io.reference.InvokerDirectory;
-import org.net.io.reference.InvokerNettyClient;
+import org.net.io.client.InvokerNettyClient;
 import org.net.io.reference.Request;
 import org.net.springextensible.beandefinition.ReferenceBean;
 import org.springframework.util.StringUtils;
@@ -41,6 +41,6 @@ public class Invoker<T> {
         request.setInterfaceClass(referenceBean.getInterfaceClass());
         request.setMethod(method);
         request.setArgs(args);
-        return InvokerNettyClient.invoke(request,ipAddrAndPorts,referenceBean.getTimeout());
+        return new InvokerNettyClient().invoke(request,ipAddrAndPorts,referenceBean.getTimeout());
     }
 }

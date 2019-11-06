@@ -1,8 +1,7 @@
-package org.net.io.reference;
+package org.net.io.client;
 
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
-import org.net.io.BaseCommonClient;
 import org.net.invoke.InvokerBeanInfo;
 import org.net.constant.TransportTypeEnum;
 import org.net.springextensible.beandefinition.ProtocolBean;

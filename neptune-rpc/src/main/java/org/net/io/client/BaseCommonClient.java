@@ -1,4 +1,4 @@
-package org.net.io;
+package org.net.io.client;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
@@ -11,8 +11,8 @@ import io.netty.handler.timeout.IdleStateHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.net.handler.MsgpackDecoder;
 import org.net.handler.MsgpackEncoder;
-import org.net.io.handler.BussnessHandler;
 import org.net.io.handler.ConnectionWatchDogHandler;
+import org.net.io.handler.SubscribeHandler;
 import org.net.springextensible.beandefinition.RegistryBean;
 import org.net.transport.RemoteTransporter;
 
@@ -54,7 +54,7 @@ public abstract class BaseCommonClient {
                 socketChannel.pipeline().addLast("MessagePack Decoder", new MsgpackDecoder());
                 // 调用自定义的看门狗重连处理类，主要处理异常重连
                 channelPipeline.addLast(ConnectionWatchDogHandler.createConnectionWatchDogHandler(bootstrap, BaseCommonClient.this));
-                channelPipeline.addLast(new BussnessHandler());
+                channelPipeline.addLast(new SubscribeHandler());
             }
         });
         doConnect();

@@ -8,26 +8,21 @@ import org.msgpack.MessagePack;
 import org.net.constant.TransportTypeEnum;
 import org.net.manager.ChannelDirectory;
 import org.net.manager.RegistrationDirectory;
-import org.net.springextensible.RegistrationBeanDefinition;
 import org.net.transport.InvokerBeanExport;
 import org.net.transport.RemoteTransporter;
-import org.net.util.SpringContextHolder;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 /**
- * @Classname BussnessHandler
+ * @Classname BusinessHandler
  * @Description 自定义InboundHandler
  * @Date 2019/11/1 23:15
  * @Created by admin
  */
 @Slf4j
-public class BussnessHandler extends ChannelInboundHandlerAdapter {
+public class BusinessHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
@@ -72,17 +67,8 @@ public class BussnessHandler extends ChannelInboundHandlerAdapter {
         if (TransportTypeEnum.SUBSCRIBE.getType().equals(readTransporter.getTransType())) {
             // 当收到的是服务订阅类型
             List<InvokerBeanExport> invokerBeanExportList = JSON.parseArray(readTransporter.getTransContent(), InvokerBeanExport.class);
-            for (InvokerBeanExport invokerBeanExport : invokerBeanExportList) {
-                RegistrationDirectory.putReferenceBeanInfo(invokerBeanExport.getInterfaceClass(), remoteIpAddrAndPort);
-                //返回订阅的结果
-                Map<String, String> directoryMap = RegistrationDirectory.subscribeResult(invokerBeanExport.getInterfaceClass());
-                RegistrationBeanDefinition registrationBeanDefinition = SpringContextHolder.getBean(RegistrationBeanDefinition.class);
-                String localIpAddrAndPort = InetAddress.getLocalHost().getHostAddress() + ":" + registrationBeanDefinition.getPort();
-                RemoteTransporter transporter = RemoteTransporter.create(UUID.randomUUID().toString(), localIpAddrAndPort, JSON.toJSONString(directoryMap), TransportTypeEnum.SUBSCRIBE_RESULT.getType());
-                ctx.writeAndFlush(transporter);
-                // 维护channel()
-                ChannelDirectory.putChannel(remoteIpAddrAndPort, ctx.channel());
-            }
+            // 维护channel()
+            ChannelDirectory.putChannel(remoteIpAddrAndPort, ctx.channel());
         }
     }
 

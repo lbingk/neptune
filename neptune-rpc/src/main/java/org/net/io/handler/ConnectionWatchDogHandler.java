@@ -5,7 +5,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.Getter;
 import lombok.Setter;
-import org.net.io.BaseCommonClient;
+import org.net.io.client.BaseCommonClient;
 
 
 /**
