@@ -1,18 +1,19 @@
-package org.net.io;
+package org.net.io.server;
 
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.*;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.timeout.IdleStateHandler;
-import org.net.manager.RegistrationDirectory;
 import org.net.handler.MsgpackDecoder;
 import org.net.handler.MsgpackEncoder;
-import org.net.io.handler.BusinessHandler;
-import org.net.springextensible.RegistrationBeanDefinition;
+import org.net.springextensible.beandefinition.ProtocolBean;
 import org.net.util.SpringContextHolder;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -21,17 +22,17 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @Classname NettyServer
- * @Description
- * @Date 2019/11/1 22:49
- * @Created by admin
+ * @program: neptune
+ * @description: 服务提供者的服务器
+ * @author: LUOBINGKAI
+ * @create: 2019-11-05 19:58
  */
 @Component
-public class NettyServer implements ApplicationListener<ContextRefreshedEvent> {
+public class ServiceServer implements ApplicationListener<ContextRefreshedEvent> {
 
     public void run() {
         // 获取配置的参数：port 以及 timeout
-        RegistrationBeanDefinition registrationBeanDefinition = SpringContextHolder.getBean(RegistrationBeanDefinition.class);
+        ProtocolBean protocolBean = SpringContextHolder.getBean(ProtocolBean.class);
         // 创建Boss：作用于客户端的连接
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         // 创建woker：作用于迭代器可用的连接
@@ -50,11 +51,10 @@ public class NettyServer implements ApplicationListener<ContextRefreshedEvent> {
                         socketChannel.pipeline().addLast("MessagePack Decoder", new MsgpackDecoder());
                         socketChannel.pipeline().addLast("frameEncoder", new LengthFieldPrepender(2));
                         socketChannel.pipeline().addLast("MessagePack encoder", new MsgpackEncoder());
-                        pipeline.addLast(new BusinessHandler());
                     }
                 }).option(ChannelOption.SO_BACKLOG, 2048 * 2048 * 2048);
         try {
-             bootstrap.bind(registrationBeanDefinition.getPort()).sync();
+            bootstrap.bind(protocolBean.getPort()).sync();
         } catch (InterruptedException e) {
             e.printStackTrace();
             // 异常情况优雅关闭
@@ -63,9 +63,9 @@ public class NettyServer implements ApplicationListener<ContextRefreshedEvent> {
         }
     }
 
+
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
-        this.run();
-        RegistrationDirectory.refreshBeanInfoMap();
+      this.run();
     }
 }

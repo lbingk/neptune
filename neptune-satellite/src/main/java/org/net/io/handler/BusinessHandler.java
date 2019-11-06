@@ -65,8 +65,6 @@ public class BusinessHandler extends ChannelInboundHandlerAdapter {
      */
     private void doSubscriber(ChannelHandlerContext ctx, RemoteTransporter readTransporter, String remoteIpAddrAndPort) throws UnknownHostException {
         if (TransportTypeEnum.SUBSCRIBE.getType().equals(readTransporter.getTransType())) {
-            // 当收到的是服务订阅类型
-            List<InvokerBeanExport> invokerBeanExportList = JSON.parseArray(readTransporter.getTransContent(), InvokerBeanExport.class);
             // 维护channel()
             ChannelDirectory.putChannel(remoteIpAddrAndPort, ctx.channel());
         }
