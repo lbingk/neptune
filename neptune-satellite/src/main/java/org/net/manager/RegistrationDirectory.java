@@ -1,20 +1,19 @@
 package org.net.manager;
 
+import com.alibaba.fastjson.JSON;
 import io.netty.channel.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.net.constant.TransportTypeEnum;
 import org.net.springextensible.RegistrationBeanDefinition;
 import org.net.transport.RemoteTransporter;
+import org.net.transport.SubscribeResult;
 import org.net.util.SpringContextHolder;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * @Classname RegistrationDirectory
@@ -30,24 +29,24 @@ public class RegistrationDirectory {
 
 
     /**
-     * 用 ConcurrentHashMap 来装载对应的注册服务:key值为暴露的服务接口名,InvokerBeanExport的 JSON 字符串
+     * 用 ConcurrentHashMap 来装载对应的注册服务:key值为暴露的服务接口名,ServiceBeanExport的 JSON 字符串
      **/
-    public static Map<String, Map<String, String>> serviceBeanInfoMap = new ConcurrentHashMap<>();
+    public static final Map<String, Map<String, String>> serviceBeanInfoMap = new ConcurrentHashMap<>();
 
     /**
      * 用 ConcurrentHashMap 来装载对应的订阅服务:key值为需要订阅的服务接口名
      **/
-    public static Map<String, Set<String>> referenceBeanInfoMap = new ConcurrentHashMap<>();
+    public static final Map<String, Set<String>> referenceBeanInfoMap = new ConcurrentHashMap<>();
 
     /**
      * 用 ConcurrentHashMap 来装载对应的注册服务机器心跳连接时的时间
      **/
-    private static Map<String, Long> registryHostTimeMap = new ConcurrentHashMap<>();
+    private static final Map<String, Long> registryHostTimeMap = new ConcurrentHashMap<>();
 
     /**
      * 用 ConcurrentHashMap 来装载对应的订阅服务机器心跳连接时的时间
      **/
-    private static Map<String, Long> subscribeHostTimeMap = new ConcurrentHashMap<>();
+    private static final Map<String, Long> subscribeHostTimeMap = new ConcurrentHashMap<>();
 
     /**
      * 提供注册服务
@@ -68,17 +67,6 @@ public class RegistrationDirectory {
         serviceBeanInfoMap.put(interfaceName, serviceProviderMap);
         registryHostTimeMap.put(ipAddrAndPort, System.currentTimeMillis());
     }
-
-    /**
-     * 返回订阅的结果
-     *
-     * @param interfaceName
-     * @return
-     */
-    public static Map<String, String> subscribeResult(String interfaceName) {
-        return serviceBeanInfoMap.get(interfaceName);
-    }
-
 
     /**
      * 刷新记录心跳时间
@@ -203,7 +191,10 @@ public class RegistrationDirectory {
                                 continue;
                             }
                             try {
-                                RemoteTransporter transporter = RemoteTransporter.create(UUID.randomUUID().toString(), localIpAddrAndPort, TransportTypeEnum.SUBSCRIBE_RESULT.getType());
+                                SubscribeResult subscribeResult = new SubscribeResult();
+                                subscribeResult.setInterfaceClassName(interfaceName);
+                                RemoteTransporter transporter = RemoteTransporter.create(UUID.randomUUID().toString(), localIpAddrAndPort,
+                                        JSON.toJSONString(subscribeResult), TransportTypeEnum.SUBSCRIBE_RESULT.getType());
                                 log.info("transporter:[{}]", transporter);
                                 channel.writeAndFlush(transporter);
                             } finally {
@@ -243,10 +234,10 @@ public class RegistrationDirectory {
     public static void pushService(String interfaceClassName) {
         if (serviceBeanInfoMap.containsKey(interfaceClassName) && referenceBeanInfoMap.containsKey(interfaceClassName)) {
             // 获取该服务下的注册信息：ipAddrAndPort,serviceBeanInfo
-            Map<String, String> serviceMap = serviceBeanInfoMap.get(interfaceClassName);
+            Set<String> ipAddrAndPortSets = serviceBeanInfoMap.get(interfaceClassName).keySet();
             // 获取该服务下的订阅者
             Set<String> referenceAddrSets = referenceBeanInfoMap.get(interfaceClassName);
-            // 拼接ipAndPort
+            // 拼接 ipAndPort
             RegistrationBeanDefinition registrationBeanDefinition = SpringContextHolder.getBean(RegistrationBeanDefinition.class);
             String localIpAddrAndPort = null;
             try {
@@ -255,23 +246,37 @@ public class RegistrationDirectory {
                 e.printStackTrace();
             }
 
-            // 推送服务，按照服务来
+            // 推送服务，按照订阅方来,一次性将所有的注册地址发送
             for (String referenceAddr : referenceAddrSets) {
-                if (serviceMap.containsKey(referenceAddr)) {
-                    String serviceBeanStr = serviceMap.get(referenceAddr);
-                    Channel channel = ChannelDirectory.getChannel(referenceAddr);
-                    if (channel == null) {
-                        continue;
-                    }
-                    try {
-                        RemoteTransporter transporter = RemoteTransporter.create(UUID.randomUUID().toString(), localIpAddrAndPort, serviceBeanStr, TransportTypeEnum.SUBSCRIBE_RESULT.getType());
-                        log.info("transporter:[{}]", transporter);
-                        channel.writeAndFlush(transporter);
-                    } finally {
-                        continue;
-                    }
+                Channel channel = ChannelDirectory.getChannel(referenceAddr);
+                if (channel == null) {
+                    continue;
+                }
+                SubscribeResult subscribeResult = new SubscribeResult();
+                subscribeResult.setInterfaceClassName(interfaceClassName);
+                subscribeResult.setIpAddrAndPortSets(ipAddrAndPortSets);
+                try {
+                    RemoteTransporter transporter = RemoteTransporter.create(UUID.randomUUID().toString(), localIpAddrAndPort,
+                            JSON.toJSONString(subscribeResult), TransportTypeEnum.SUBSCRIBE_RESULT.getType());
+                    log.info("transporter:[{}]", transporter);
+                    channel.writeAndFlush(transporter);
+                } finally {
+                    continue;
                 }
             }
         }
+    }
+
+    /**
+     * 获取相应的地址列表
+     *
+     * @param interfaceClass
+     * @return
+     */
+    public static Set<String> getServiceHost(String interfaceClass) {
+        if (serviceBeanInfoMap.containsKey(interfaceClass)) {
+            return serviceBeanInfoMap.get(interfaceClass).keySet();
+        }
+        return new CopyOnWriteArraySet<>();
     }
 }

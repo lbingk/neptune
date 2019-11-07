@@ -16,7 +16,7 @@ import org.net.handler.MsgpackEncoder;
  * @create: 2019-11-06 10:32
  */
 @Slf4j
-public class ProviderHandler extends ChannelInitializer<SocketChannel> {
+public class ServiceHandler extends ChannelInitializer<SocketChannel> {
     @Override
     protected void initChannel(SocketChannel socketChannel) throws Exception {
         ChannelPipeline channelPipeline = socketChannel.pipeline();
@@ -26,6 +26,6 @@ public class ProviderHandler extends ChannelInitializer<SocketChannel> {
         socketChannel.pipeline().addLast("frameDecoder", new LengthFieldBasedFrameDecoder(65535, 0, 2, 0, 2));
         socketChannel.pipeline().addLast("MessagePack Decoder", new MsgpackDecoder());
         // 业务
-        channelPipeline.addLast(new ProviderBusinessHandler());
+        channelPipeline.addLast(new ServiceBusinessHandler());
     }
 }

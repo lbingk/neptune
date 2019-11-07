@@ -16,9 +16,11 @@ import org.w3c.dom.Element;
 public class ProtocolBeanDefinitionNamespaceParser implements BeanDefinitionParser {
 
     private Class<?> clz;
+    private String id;
 
-    public ProtocolBeanDefinitionNamespaceParser(Class<?> clz) {
+    public ProtocolBeanDefinitionNamespaceParser(String id, Class<?> clz) {
         this.clz = clz;
+        this.id = id;
     }
 
     @Override
@@ -28,9 +30,8 @@ public class ProtocolBeanDefinitionNamespaceParser implements BeanDefinitionPars
         beanDef.setLazyInit(Boolean.FALSE);
         beanDef.getPropertyValues().add("ip", element.getAttribute("ip"));
         beanDef.getPropertyValues().add("port", element.getAttribute("port"));
-//        beanDef.getPropertyValues().add("timeout", element.getAttribute("timeout"));
         BeanDefinitionRegistry beanDefRegistry = parserContext.getRegistry();
-        beanDefRegistry.registerBeanDefinition(clz.getName(), beanDef);
+        beanDefRegistry.registerBeanDefinition(this.id, beanDef);
         return beanDef;
     }
 }

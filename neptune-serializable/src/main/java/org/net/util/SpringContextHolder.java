@@ -1,10 +1,11 @@
 package org.net.util;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
-
+@Slf4j
 @Component
 public class SpringContextHolder implements ApplicationContextAware {
 
@@ -31,8 +32,15 @@ public class SpringContextHolder implements ApplicationContextAware {
      */
     @SuppressWarnings("unchecked")
     public static <T> T getBean(String name) {
-        checkApplicationContext();
-        return (T) applicationContext.getBean(name);
+        T bean = null;
+        try {
+            checkApplicationContext();
+            bean = (T) applicationContext.getBean(name);
+        } catch (Exception e) {
+            log.error("不存在此bean：[{}]", name);
+        } finally {
+            return bean;
+        }
     }
 
     /**

@@ -2,12 +2,13 @@ package org.net.io.handler;
 
 import com.alibaba.fastjson.JSON;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.extern.slf4j.Slf4j;
 import org.msgpack.MessagePack;
 import org.net.constant.TransportTypeEnum;
 import org.net.io.reference.InvokerDirectory;
-import org.net.transport.InvokerBeanExport;
 import org.net.transport.RemoteTransporter;
+import org.net.transport.SubscribeResult;
 
 /**
  * @Description 定义处理读的处理
@@ -16,17 +17,16 @@ import org.net.transport.RemoteTransporter;
  * @Version 1.0
  **/
 @Slf4j
-public class SubscribeHandler extends BaseBusinessHandler {
+public class ToSatelliteBusinessHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         RemoteTransporter readTransporter = MessagePack.unpack(MessagePack.pack(msg), RemoteTransporter.class);
-        String ipAddrAndPort = readTransporter.getIpAddrAndPort();
 
         if (TransportTypeEnum.SUBSCRIBE_RESULT.getType().equals(readTransporter.getTransType())) {
             //返回的订阅的地址列表信息
-            InvokerBeanExport invokerBeanExport = JSON.parseObject(readTransporter.getTransContent(), InvokerBeanExport.class);
-            InvokerDirectory.addInvoker(invokerBeanExport.getInterfaceClass(), ipAddrAndPort);
+            SubscribeResult subscribeResult = JSON.parseObject(readTransporter.getTransContent(), SubscribeResult.class);
+            InvokerDirectory.addInvoker(subscribeResult);
         }
 
         log.info(readTransporter.toString());
@@ -41,5 +41,6 @@ public class SubscribeHandler extends BaseBusinessHandler {
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         cause.printStackTrace();
     }
+
 }
 

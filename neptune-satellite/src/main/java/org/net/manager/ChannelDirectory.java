@@ -19,7 +19,7 @@ public class ChannelDirectory {
     /**
      * key为ipAddrAndPort
      */
-    public static Map<String, Channel> channelMap = new ConcurrentHashMap<>();
+    public static final Map<String, Channel> channelMap = new ConcurrentHashMap<>();
 
     /**
      * 存储Channel

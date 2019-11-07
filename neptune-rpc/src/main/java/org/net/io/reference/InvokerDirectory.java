@@ -3,12 +3,12 @@ package org.net.io.reference;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.net.transport.SubscribeResult;
 
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * @program: neptune
@@ -24,6 +24,10 @@ public class InvokerDirectory {
     private InvokerDirectory() {
     }
 
+    public static Map<String, Set<String>> getInvokerDirectoryMap() {
+        return invokerDirectoryMap;
+    }
+
     /**
      * 存在注册中心返回的地址列表信息：key为interfaceName,value为地址列表
      */
@@ -32,18 +36,14 @@ public class InvokerDirectory {
     /**
      * 保存服务地址信息
      *
-     * @param interfaceName
-     * @param ipAddrAndPort
+     * @param subscribeResult
      */
-    public static void addInvoker(String interfaceName, String ipAddrAndPort) {
-        if (invokerDirectoryMap.containsKey(interfaceName)) {
-            invokerDirectoryMap.get(interfaceName).add(ipAddrAndPort);
-        } else {
-            Set<String> invokerDirectorySet = new CopyOnWriteArraySet<>();
-            invokerDirectorySet.add(ipAddrAndPort);
-            invokerDirectoryMap.put(interfaceName, invokerDirectorySet);
-        }
+    public static void addInvoker(SubscribeResult subscribeResult) {
+        String interfaceClassName = subscribeResult.getInterfaceClassName();
+        Set<String> ipAddrAndPortSets = subscribeResult.getIpAddrAndPortSets();
+        invokerDirectoryMap.put(interfaceClassName, ipAddrAndPortSets);
     }
+
 
     /**
      * 随机算法获取地址

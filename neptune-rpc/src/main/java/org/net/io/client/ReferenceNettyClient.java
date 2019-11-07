@@ -1,17 +1,21 @@
 package org.net.io.client;
 
 
+import com.alibaba.fastjson.JSON;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.extern.slf4j.Slf4j;
-import org.net.io.handler.InvokerHandler;
+import org.net.constant.TransportTypeEnum;
+import org.net.io.handler.ReferenceHandler;
 import org.net.io.reference.DefaultFuture;
 import org.net.io.reference.NettyChannel;
 import org.net.io.reference.Request;
+import org.net.transport.RemoteTransporter;
 import org.springframework.util.StringUtils;
 
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -21,7 +25,7 @@ import java.util.concurrent.TimeUnit;
  * @create: 2019-11-02 16:56
  */
 @Slf4j
-public class InvokerNettyClient {
+public class ReferenceNettyClient {
 
     private Bootstrap bootstrap;
     private int timeout;
@@ -29,7 +33,7 @@ public class InvokerNettyClient {
     private String invokerDirectory;
     private Request request;
 
-    public InvokerNettyClient(Request request, String invokerDirectory, int timeout, int retries) {
+    public ReferenceNettyClient(Request request, String invokerDirectory, int timeout, int retries) {
         this.request = request;
         this.invokerDirectory = invokerDirectory;
         this.timeout = timeout;
@@ -46,7 +50,8 @@ public class InvokerNettyClient {
         bootstrap.channel(NioSocketChannel.class);
         bootstrap.option(ChannelOption.SO_KEEPALIVE, true);
         bootstrap.group(eventLoopGroup);
-        bootstrap.handler(new InvokerHandler());
+        bootstrap.handler(new ReferenceHandler());
+
     }
 
     /**
@@ -80,7 +85,9 @@ public class InvokerNettyClient {
      * @throws Exception
      */
     public Object doSend(Channel channel) throws Exception {
-        channel.writeAndFlush(request);
+        // 获取客户端地址
+        RemoteTransporter remoteTransporter = RemoteTransporter.create(UUID.randomUUID().toString(), invokerDirectory, JSON.toJSONString(request), TransportTypeEnum.INVOKER.getType());
+        channel.writeAndFlush(remoteTransporter);
         return new DefaultFuture(request, channel).get(timeout);
     }
 

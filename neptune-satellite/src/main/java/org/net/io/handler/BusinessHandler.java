@@ -8,12 +8,19 @@ import org.msgpack.MessagePack;
 import org.net.constant.TransportTypeEnum;
 import org.net.manager.ChannelDirectory;
 import org.net.manager.RegistrationDirectory;
-import org.net.transport.InvokerBeanExport;
+import org.net.springextensible.RegistrationBeanDefinition;
+import org.net.transport.ReferenceBeanExport;
 import org.net.transport.RemoteTransporter;
+import org.net.transport.ServiceBeanExport;
+import org.net.transport.SubscribeResult;
+import org.net.util.SpringContextHolder;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * @Classname BusinessHandler
@@ -34,7 +41,7 @@ public class BusinessHandler extends ChannelInboundHandlerAdapter {
         String remoteIpAddrAndPort = readTransporter.getIpAddrAndPort();
         log.info(readTransporter.toString());
 
-        doRegistry(ctx, readTransporter, remoteIpAddrAndPort);
+        doRegistry(readTransporter, remoteIpAddrAndPort);
 
         doSubscriber(ctx, readTransporter, remoteIpAddrAndPort);
 
@@ -63,30 +70,53 @@ public class BusinessHandler extends ChannelInboundHandlerAdapter {
      * @param remoteIpAddrAndPort
      * @throws UnknownHostException
      */
-    private void doSubscriber(ChannelHandlerContext ctx, RemoteTransporter readTransporter, String remoteIpAddrAndPort) throws UnknownHostException {
+    private void doSubscriber(ChannelHandlerContext ctx, RemoteTransporter readTransporter, String remoteIpAddrAndPort) {
         if (TransportTypeEnum.SUBSCRIBE.getType().equals(readTransporter.getTransType())) {
-            // 维护channel()
-            ChannelDirectory.putChannel(remoteIpAddrAndPort, ctx.channel());
+            List<ReferenceBeanExport> referenceBeanExportList = JSON.parseArray(readTransporter.getTransContent(), ReferenceBeanExport.class);
+            for (ReferenceBeanExport referenceBeanExport : referenceBeanExportList) {
+                RegistrationDirectory.putReferenceBeanInfo(referenceBeanExport.getInterfaceClass(), remoteIpAddrAndPort);
+                // 维护channel()
+                ChannelDirectory.putChannel(remoteIpAddrAndPort, ctx.channel());
+                // 推送服务
+                RegistrationBeanDefinition registrationBeanDefinition = SpringContextHolder.getBean(RegistrationBeanDefinition.class);
+                Set<String> serviceHostSets = RegistrationDirectory.getServiceHost(referenceBeanExport.getInterfaceClass());
+                if (serviceHostSets.isEmpty()) {
+                    continue;
+                }
+                String localIpAddrAndPort = null;
+                try {
+
+                    localIpAddrAndPort = InetAddress.getLocalHost().getHostAddress() + ":" + registrationBeanDefinition.getPort();
+                } catch (UnknownHostException e) {
+                    e.printStackTrace();
+                }
+
+                SubscribeResult subscribeResult = new SubscribeResult();
+                subscribeResult.setInterfaceClassName(referenceBeanExport.getInterfaceClass());
+                subscribeResult.setIpAddrAndPortSets(serviceHostSets);
+                RemoteTransporter transporter = RemoteTransporter.create(UUID.randomUUID().toString(), localIpAddrAndPort,
+                        JSON.toJSONString(subscribeResult), TransportTypeEnum.SUBSCRIBE_RESULT.getType());
+                log.info("transporter:[{}]", transporter);
+                ctx.writeAndFlush(transporter);
+            }
         }
     }
+
 
     /**
      * 处理注册
      *
-     * @param ctx
      * @param readTransporter
      * @param remoteIpAddrAndPort
      */
-    private void doRegistry(ChannelHandlerContext ctx, RemoteTransporter readTransporter, String remoteIpAddrAndPort) {
+    private void doRegistry(RemoteTransporter readTransporter, String remoteIpAddrAndPort) {
         if (TransportTypeEnum.REGISTRY.getType().equals(readTransporter.getTransType())) {
             // 当收到的是服务注册类型
-            List<InvokerBeanExport> invokerBeanExportList = JSON.parseArray(readTransporter.getTransContent(), InvokerBeanExport.class);
-            for (InvokerBeanExport invokerBeanExport : invokerBeanExportList) {
-                String interfaceClassName = invokerBeanExport.getInterfaceClass();
-                String jsonString = JSON.toJSONString(invokerBeanExport);
+            List<ServiceBeanExport> serviceBeanExportList = JSON.parseArray(readTransporter.getTransContent(), ServiceBeanExport.class);
+            for (ServiceBeanExport serviceBeanExport : serviceBeanExportList) {
+                String interfaceClassName = serviceBeanExport.getInterfaceClass();
+                String jsonString = JSON.toJSONString(serviceBeanExport);
                 RegistrationDirectory.putInvokerBeanInfo(interfaceClassName, remoteIpAddrAndPort, jsonString);
-                // 维护channel()
-                ChannelDirectory.putChannel(remoteIpAddrAndPort, ctx.channel());
                 // 推送服务
                 RegistrationDirectory.pushService(interfaceClassName);
             }

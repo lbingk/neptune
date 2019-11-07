@@ -6,7 +6,7 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import org.net.io.handler.ProviderHandler;
+import org.net.io.handler.ServiceHandler;
 import org.net.springextensible.beandefinition.ProtocolBean;
 import org.net.util.SpringContextHolder;
 import org.springframework.context.ApplicationListener;
@@ -35,15 +35,18 @@ public class ServiceServer implements ApplicationListener<ContextRefreshedEvent>
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
-        doConnect();
+        protocolBean = SpringContextHolder.getBean("serviceProtocol");
+        if (protocolBean == null) {
+            return;
+        }
         doOpen();
+        doConnect();
     }
 
     /**
      * 创建启动类：ServerBootstrap
      */
     private void doOpen() {
-        protocolBean = SpringContextHolder.getBean(ProtocolBean.class);
         // 创建Boss：作用于客户端的连接
         bossGroup = new NioEventLoopGroup();
         // 创建woker：作用于迭代器可用的连接
@@ -52,7 +55,7 @@ public class ServiceServer implements ApplicationListener<ContextRefreshedEvent>
         bootstrap = new ServerBootstrap();
         // 配置参数
         bootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class).
-                childHandler(new ProviderHandler()).option(ChannelOption.SO_BACKLOG, 2048 * 2048 * 2048);
+                childHandler(new ServiceHandler()).option(ChannelOption.SO_BACKLOG, 2048 * 2048 * 2048);
     }
 
     /**

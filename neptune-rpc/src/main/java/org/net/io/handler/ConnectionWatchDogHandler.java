@@ -5,7 +5,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.Getter;
 import lombok.Setter;
-import org.net.io.client.BaseCommonClient;
+import org.net.io.client.ToSatelliteNettyClientBaseClient;
 
 
 /**
@@ -20,9 +20,9 @@ import org.net.io.client.BaseCommonClient;
 public class ConnectionWatchDogHandler extends ChannelInboundHandlerAdapter {
 
     private Bootstrap bootstrap = null;
-    private BaseCommonClient client = null;
+    private ToSatelliteNettyClientBaseClient client = null;
 
-    public static ConnectionWatchDogHandler createConnectionWatchDogHandler(Bootstrap _bootstrap, BaseCommonClient _client) {
+    public static ConnectionWatchDogHandler createConnectionWatchDogHandler(Bootstrap _bootstrap, ToSatelliteNettyClientBaseClient _client) {
         ConnectionWatchDogHandler connectionWatchDogHandler = new ConnectionWatchDogHandler();
         connectionWatchDogHandler.setBootstrap(_bootstrap);
         connectionWatchDogHandler.setClient(_client);

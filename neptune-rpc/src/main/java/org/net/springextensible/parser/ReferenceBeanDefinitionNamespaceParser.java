@@ -30,6 +30,9 @@ public class ReferenceBeanDefinitionNamespaceParser implements BeanDefinitionPar
         String interfaceName = element.getAttribute("interface");
         beanDefinition.getPropertyValues().add("interfaceName", interfaceName);
 
+        beanDefinition.getPropertyValues().add("retries", element.getAttribute("retries"));
+        beanDefinition.getPropertyValues().add("timeout", element.getAttribute("timeout"));
+
         // 每个配置ServiceBean对象的注册到容器BeanDefinitionMap的时候需要用Id来区分
 
         if (interfaceName != null && interfaceName.length() > 0) {

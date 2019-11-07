@@ -2,7 +2,7 @@ package org.net.invoke;
 
 import io.netty.channel.Channel;
 import lombok.*;
-import org.net.io.client.InvokerNettyClient;
+import org.net.io.client.ReferenceNettyClient;
 import org.net.io.reference.InvokerDirectory;
 import org.net.io.reference.Request;
 import org.net.springextensible.beandefinition.ReferenceBean;
@@ -52,7 +52,7 @@ public class Invoker<T> {
      * @throws Exception
      */
     private Object doInvoke(String invokerDirectory, Request request) throws Exception {
-        InvokerNettyClient invokerNettyClient = new InvokerNettyClient(request,invokerDirectory, referenceBean.getTimeout(), referenceBean.getReties());
+        ReferenceNettyClient invokerNettyClient = new ReferenceNettyClient(request,invokerDirectory, referenceBean.getTimeout(), referenceBean.getRetries());
         invokerNettyClient.doOpen();
         Channel channel = invokerNettyClient.dcConnect();
         return invokerNettyClient.doSend(channel);

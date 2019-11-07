@@ -7,7 +7,7 @@ import lombok.ToString;
 
 
 /**
- * @Classname InvokerBeanExport
+ * @Classname ServiceBeanExport
  * @author: LUOBINGKAI
  * @Description 暴露服务实体信息
  * @Date 2019/11/2 23:55
@@ -18,11 +18,11 @@ import lombok.ToString;
 @Setter
 @ToString
 @NoArgsConstructor
-public class InvokerBeanExport {
+public class ServiceBeanExport {
     private String interfaceClass;
     private StringBuilder methods = new StringBuilder(16);
 
-    public InvokerBeanExport(Class<?> interfaceClass) {
+    public ServiceBeanExport(Class<?> interfaceClass) {
         this.interfaceClass = interfaceClass.getName();
         for (int i = interfaceClass.getMethods().length - 1; i >= 0; i--) {
             methods.append(interfaceClass.getMethods()[i]);

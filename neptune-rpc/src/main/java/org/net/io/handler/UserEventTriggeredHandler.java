@@ -5,10 +5,9 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import lombok.extern.slf4j.Slf4j;
+import org.net.constant.TransportTypeEnum;
 import org.net.springextensible.beandefinition.ProtocolBean;
 import org.net.transport.RemoteTransporter;
-import org.net.constant.TransportTypeEnum;
-import org.net.util.SpringContextHolder;
 
 import java.util.UUID;
 
@@ -19,11 +18,11 @@ import java.util.UUID;
  * @create: 2019-11-06 10:43
  */
 @Slf4j
-public class BaseBusinessHandler extends ChannelInboundHandlerAdapter {
-    private static final String ipAddrAndPort;
+public class UserEventTriggeredHandler extends ChannelInboundHandlerAdapter {
 
-    static {
-        ProtocolBean protocolBean = SpringContextHolder.getBean(ProtocolBean.class);
+    private String ipAddrAndPort;
+
+    public UserEventTriggeredHandler(ProtocolBean protocolBean) {
         ipAddrAndPort = protocolBean.getIp() + ":" + protocolBean.getPort();
     }
 
@@ -37,7 +36,6 @@ public class BaseBusinessHandler extends ChannelInboundHandlerAdapter {
             }
         }
     }
-
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {

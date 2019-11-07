@@ -1,5 +1,6 @@
 package org.net.io.reference;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,6 +16,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 @Setter
 @Getter
+@AllArgsConstructor
 public class Request<T> implements Serializable {
     public Class<T> interfaceClass;
     public Method method;
