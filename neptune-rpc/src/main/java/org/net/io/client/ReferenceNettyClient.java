@@ -87,6 +87,7 @@ public class ReferenceNettyClient {
     public Object doSend(Channel channel) throws Exception {
         // 获取客户端地址
         RemoteTransporter remoteTransporter = RemoteTransporter.create(UUID.randomUUID().toString(), invokerDirectory, JSON.toJSONString(request), TransportTypeEnum.INVOKER.getType());
+
         channel.writeAndFlush(remoteTransporter);
         return new DefaultFuture(request, channel).get(timeout);
     }

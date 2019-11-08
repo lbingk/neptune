@@ -1,5 +1,6 @@
 package org.net.io.reference;
 
+import com.alibaba.fastjson.JSON;
 import io.netty.channel.Channel;
 import io.netty.util.HashedWheelTimer;
 import io.netty.util.Timeout;
@@ -145,7 +146,9 @@ public class DefaultFuture {
             throw new IllegalStateException("response cannot be null");
         }
         if (res.getStatus() == Response.OK) {
-            return res.getContent();
+            DefaultFuture defaultFuture = DEFAULT_FUTURE_MAP.get(res.getMid());
+            Request request = defaultFuture.getRequest();
+            return JSON.parseObject(res.getContent(), request.getReturnType());
         }
         if (res.getStatus() == Response.SERVER_TIMEOUT) {
             throw new RuntimeException(response.errorMessage);
@@ -170,7 +173,7 @@ public class DefaultFuture {
      */
     private String getErrorMessage(DefaultFuture defaultFuture) {
         Request request = defaultFuture.getRequest();
-        String req = request.getInterfaceClass() + "." + request.getMethod() + "." + request.getArgs();
+        String req = request.getInterfaceClassName() + "." + request.getMethodName() + "." + request.getArgs();
         String errorMsg = req + "执行时间过长：" + (System.currentTimeMillis() - defaultFuture.getStartTimestamp()) + ",已经超出设定值：" + defaultFuture.getTimeout();
         return errorMsg;
     }

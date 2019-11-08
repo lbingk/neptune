@@ -37,8 +37,10 @@ public class Invoker<T> {
             throw new Exception("不存在此服务提供者：" + referenceBean.getInterfaceName());
         }
         Request request = new Request();
-        request.setInterfaceClass(referenceBean.getInterfaceClass());
-        request.setMethod(method);
+        request.setInterfaceClassName(referenceBean.getInterfaceClass().getName());
+        request.setMethodName(method.getName());
+        request.setParameterTypes(method.getParameterTypes());
+        request.setReturnType(method.getReturnType());
         request.setArgs(args);
         return doInvoke(invokerDirectory, request);
     }
@@ -52,7 +54,7 @@ public class Invoker<T> {
      * @throws Exception
      */
     private Object doInvoke(String invokerDirectory, Request request) throws Exception {
-        ReferenceNettyClient invokerNettyClient = new ReferenceNettyClient(request,invokerDirectory, referenceBean.getTimeout(), referenceBean.getRetries());
+        ReferenceNettyClient invokerNettyClient = new ReferenceNettyClient(request, invokerDirectory, referenceBean.getTimeout(), referenceBean.getRetries());
         invokerNettyClient.doOpen();
         Channel channel = invokerNettyClient.dcConnect();
         return invokerNettyClient.doSend(channel);

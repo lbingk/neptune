@@ -30,10 +30,14 @@ public class InvokerBeanInfo {
         serviceBeanExportList.add(new ServiceBeanExport(interfaceClass));
     }
 
-    private static Map<Class<?>, ServiceBean<?>> classServiceBeanMap = new ConcurrentHashMap<>();
+    private static Map<String, ServiceBean<?>> serviceBeanMap = new ConcurrentHashMap<>();
 
-    public static ServiceBean getServiceBean(Class<?> interfaceClass) {
-        return classServiceBeanMap.get(interfaceClass);
+    public static void putServiceBean(String interfaceClassName, ServiceBean serviceBean) {
+        serviceBeanMap.put(interfaceClassName, serviceBean);
+    }
+
+    public static ServiceBean getServiceBean(String interfaceClassName) {
+        return serviceBeanMap.get(interfaceClassName);
     }
 
     private static List<ReferenceBeanExport> referenceBeanExportList = new ArrayList<>();

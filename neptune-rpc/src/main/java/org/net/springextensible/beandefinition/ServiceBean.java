@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.net.invoke.InvokerBeanInfo;
-import org.net.util.SpringContextHolder;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
@@ -39,6 +38,8 @@ public class ServiceBean<T> implements InitializingBean, ApplicationContextAware
     public void afterPropertiesSet() throws Exception {
         interfaceClass = Class.forName(interfaceName);
         InvokerBeanInfo.addServiceBeanExport(interfaceClass);
+        // 需要存储在自定义的Map里面，无法从Spring上下文里面获取，因为不确定对应的Key是什么
+        InvokerBeanInfo.putServiceBean(interfaceClass.getName(),this);
         check();
     }
 

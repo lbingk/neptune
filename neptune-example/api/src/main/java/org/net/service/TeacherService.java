@@ -1,6 +1,6 @@
 package org.net.service;
 
-        import org.net.dto.Teacher;
+import org.net.dto.Teacher;
 
 /**
  * @program: neptune

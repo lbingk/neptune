@@ -2,10 +2,10 @@ package org.net.io.reference;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -17,10 +17,13 @@ import java.util.concurrent.atomic.AtomicLong;
 @Setter
 @Getter
 @AllArgsConstructor
-public class Request<T> implements Serializable {
-    public Class<T> interfaceClass;
-    public Method method;
+@NoArgsConstructor
+public class Request implements Serializable {
+    public String interfaceClassName;
+    public String methodName;
     public Object[] args;
+    public Class<?>[] parameterTypes;
+    public Class<?> returnType;
     public Object content;
     /**
      * 用来全局唯一的请求Id
@@ -30,11 +33,7 @@ public class Request<T> implements Serializable {
     /**
      * 请求唯一id
      */
-    public final long mid;
-
-    public Request() {
-        mid = newMid();
-    }
+    public long mid = newMid();
 
     /**
      * 生成全局的唯一ID

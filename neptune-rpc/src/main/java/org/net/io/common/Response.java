@@ -36,7 +36,7 @@ public class Response implements Serializable {
      */
     public static final byte EXPTION = 60;
 
-    public Object content = new Object();
+    public String content;
 
     public String errorMessage;
 
