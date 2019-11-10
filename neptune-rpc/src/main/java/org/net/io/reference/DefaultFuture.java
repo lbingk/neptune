@@ -47,15 +47,15 @@ public class DefaultFuture {
 
     public static final Map<Long, Channel> CHANNEL_MAP = new ConcurrentHashMap<>();
 
-    public DefaultFuture(Request request, Channel channel) {
-        DefaultFuture defaultFuture = new DefaultFuture();
-        defaultFuture.setRequest(request);
+    public DefaultFuture(Request request, Channel channel, int timeout) {
+        this.request = request;
+        this.timeout = timeout;
         DEFAULT_FUTURE_MAP.put(request.mid, this);
         CHANNEL_MAP.put(request.mid, channel);
 
-        // 创建时间任务具体内容
+        // 创建时间任务具体内容,在配置的时间内没有返回结果时自定义封装一个Response
         TimeoutFutureTask timeoutTask = new TimeoutFutureTask(request.mid);
-        timeoutFutureScanner.newTimeout(timeoutTask, timeout, TimeUnit.NANOSECONDS);
+        timeoutFutureScanner.newTimeout(timeoutTask, this.timeout, TimeUnit.NANOSECONDS);
     }
 
     /**
@@ -108,10 +108,9 @@ public class DefaultFuture {
     /**
      * 异步转同步返回远程调用结果
      *
-     * @param timeout
      * @return
      */
-    public Object get(int timeout) throws Exception {
+    public Object get() throws Exception {
         if (!isDone()) {
             long currentTimeMillis = System.currentTimeMillis();
             lock.lock();
@@ -147,8 +146,7 @@ public class DefaultFuture {
         }
         if (res.getStatus() == Response.OK) {
             DefaultFuture defaultFuture = DEFAULT_FUTURE_MAP.get(res.getMid());
-            Request request = defaultFuture.getRequest();
-            return JSON.parseObject(res.getContent(), request.getReturnType());
+            return JSON.parseObject(res.getContent(), defaultFuture.getRequest().getReturnType());
         }
         if (res.getStatus() == Response.SERVER_TIMEOUT) {
             throw new RuntimeException(response.errorMessage);
