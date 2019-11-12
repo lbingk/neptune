@@ -60,21 +60,26 @@ public class ReferenceNettyClient {
     public Channel dcConnect() throws Exception {
         // 获取旧的 channel
         Channel oldChannel = NettyChannel.CHANNEL_MAP.get(invokerDirectory);
+        final int[] currentRetries = {0};
         if (oldChannel == null || !oldChannel.isActive()) {
             // 维护 CHANNEL_MAP
             NettyChannel.CHANNEL_MAP.remove(invokerDirectory);
             // 获取客户端地址
             String[] ipAddrAndPorts = StringUtils.split(invokerDirectory, ":");
             // 建立连接
-            final int[] currentRetries = {0};
             final ChannelFuture channelFuture = bootstrap.connect(ipAddrAndPorts[0], Integer.parseInt(ipAddrAndPorts[1]));
             channelFuture.addListener(new InvokerChannelFutureListener(channelFuture, invokerDirectory, timeout, retries, currentRetries));
         }
-        Channel nowChannel = NettyChannel.CHANNEL_MAP.get(invokerDirectory);
-        if (nowChannel == null || !nowChannel.isActive()) {
-            throw new Exception(getErrorMsg());
+        for (; ; ) {
+            Channel nowChannel = NettyChannel.CHANNEL_MAP.get(invokerDirectory);
+            if (nowChannel != null && nowChannel.isActive()) {
+                return nowChannel;
+            }
+            if (currentRetries[0] > retries) {
+                break;
+            }
         }
-        return nowChannel;
+        throw new RuntimeException(getErrorMsg());
     }
 
     /**
@@ -88,7 +93,7 @@ public class ReferenceNettyClient {
         // 获取客户端地址
         RemoteTransporter remoteTransporter = RemoteTransporter.create(UUID.randomUUID().toString(), invokerDirectory, JSON.toJSONString(request), TransportTypeEnum.INVOKER.getType());
         channel.writeAndFlush(remoteTransporter);
-        return new DefaultFuture(this.request, channel,timeout).get();
+        return new DefaultFuture(this.request, channel, timeout).get();
     }
 
 

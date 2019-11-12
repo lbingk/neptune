@@ -34,7 +34,7 @@ public class Invoker<T> {
     public Object invoke(Method method, Object[] args) throws Exception {
         String invokerDirectory = InvokerDirectory.getRandom(referenceBean.getInterfaceName());
         if (StringUtils.isEmpty(invokerDirectory)) {
-            throw new Exception("不存在此服务提供者：" + referenceBean.getInterfaceName());
+            throw new RuntimeException("不存在此服务提供者：" + referenceBean.getInterfaceName());
         }
         Request request = new Request();
         request.setInterfaceClassName(referenceBean.getInterfaceClass().getName());

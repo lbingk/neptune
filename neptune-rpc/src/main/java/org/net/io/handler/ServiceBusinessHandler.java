@@ -58,13 +58,88 @@ public class ServiceBusinessHandler extends ChannelInboundHandlerAdapter {
             }
 
             // doValidateInvoker
+            DoValidateInvoker doValidateInvoker = new DoValidateInvoker(ctx, response, localIpAddrAndPort, requestInterfaceClassName, requestMethodName, requestParameterTypes, invokerMethod).invoke();
+            if (doValidateInvoker.is()){
+                return;
+            }
+            serviceBean = doValidateInvoker.getServiceBean();
+            invokerMethod = doValidateInvoker.getInvokerMethod();
+
+            // doInvoke
+            doInvoke(ctx, response, localIpAddrAndPort, requestArgs, serviceBean, invokerMethod);
+        }
+
+    }
+
+    private void doInvoke(ChannelHandlerContext ctx, Response response, String localIpAddrAndPort, Object[] requestArgs, ServiceBean serviceBean, Method invokerMethod) {
+        try {
+            Object invokeResult = invokerMethod.invoke(serviceBean.getRef(), requestArgs);
+            response.setStatus(Response.OK);
+            if (invokeResult != null) {
+                response.setContent(JSON.toJSONString(invokeResult));
+            }
+        } catch (Exception e) {
+            response.setStatus(Response.EXPTION);
+            response.setErrorMessage(e.getMessage());
+        } finally {
+            RemoteTransporter sendTransporter = RemoteTransporter.create(UUID.randomUUID().toString(), localIpAddrAndPort, JSON.toJSONString(response), TransportTypeEnum.INVOKER_RESULT.getType());
+            ctx.writeAndFlush(sendTransporter);
+        }
+    }
+
+    @Override
+    public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
+        super.channelWritabilityChanged(ctx);
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        cause.printStackTrace();
+    }
+
+    private class DoValidateInvoker {
+        private boolean myResult;
+        private ChannelHandlerContext ctx;
+        private Response response;
+        private String localIpAddrAndPort;
+        private String requestInterfaceClassName;
+        private String requestMethodName;
+        private Class<?>[] requestParameterTypes;
+        private Method invokerMethod;
+        private ServiceBean serviceBean;
+
+        public DoValidateInvoker(ChannelHandlerContext ctx, Response response, String localIpAddrAndPort, String requestInterfaceClassName, String requestMethodName, Class<?>[] requestParameterTypes, Method invokerMethod) {
+            this.ctx = ctx;
+            this.response = response;
+            this.localIpAddrAndPort = localIpAddrAndPort;
+            this.requestInterfaceClassName = requestInterfaceClassName;
+            this.requestMethodName = requestMethodName;
+            this.requestParameterTypes = requestParameterTypes;
+            this.invokerMethod = invokerMethod;
+        }
+
+        boolean is() {
+            return myResult;
+        }
+
+        public ServiceBean getServiceBean() {
+            return serviceBean;
+        }
+
+        public Method getInvokerMethod() {
+            return invokerMethod;
+        }
+
+        public DoValidateInvoker invoke() throws NoSuchMethodException {
+            Object invokerObj;
             if ((serviceBean = InvokerBeanInfo.getServiceBean(requestInterfaceClassName)) == null || (invokerObj = serviceBean.getRef()) == null) {
                 response.setStatus(Response.NO_SERVER);
                 response.setErrorMessage("不存在此服务提供者：" + requestInterfaceClassName);
                 RemoteTransporter sendTransporter = RemoteTransporter.create(
                         UUID.randomUUID().toString(), localIpAddrAndPort, JSON.toJSONString(response), TransportTypeEnum.INVOKER_RESULT.getType());
                 ctx.writeAndFlush(sendTransporter);
-                return;
+                myResult = true;
+                return this;
             }
 
             try {
@@ -76,35 +151,12 @@ public class ServiceBusinessHandler extends ChannelInboundHandlerAdapter {
                     RemoteTransporter sendTransporter = RemoteTransporter.create(
                             UUID.randomUUID().toString(), localIpAddrAndPort, JSON.toJSONString(response), TransportTypeEnum.INVOKER_RESULT.getType());
                     ctx.writeAndFlush(sendTransporter);
-                    return;
+                    myResult = true;
+                    return this;
                 }
             }
-
-            // doInvoke
-            try {
-                Object invokeResult = invokerMethod.invoke(serviceBean.getRef(), requestArgs);
-                response.setStatus(Response.OK);
-                if (invokeResult != null) {
-                    response.setContent(JSON.toJSONString(invokeResult));
-                }
-            } catch (Exception e) {
-                response.setStatus(Response.EXPTION);
-                response.setErrorMessage(e.getMessage());
-            } finally {
-                RemoteTransporter sendTransporter = RemoteTransporter.create(UUID.randomUUID().toString(), localIpAddrAndPort, JSON.toJSONString(response), TransportTypeEnum.INVOKER_RESULT.getType());
-                ctx.writeAndFlush(sendTransporter);
-            }
+            myResult = false;
+            return this;
         }
-
-    }
-
-    @Override
-    public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
-        super.channelWritabilityChanged(ctx);
-    }
-
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        cause.printStackTrace();
     }
 }

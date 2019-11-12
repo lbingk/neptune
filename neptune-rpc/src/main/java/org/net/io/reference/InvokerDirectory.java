@@ -53,7 +53,7 @@ public class InvokerDirectory {
      */
     public static String getRandom(String interfaceName) {
         Set<String> invokerDirectorySet = invokerDirectoryMap.get(interfaceName);
-        if (invokerDirectorySet == null) {
+        if (invokerDirectorySet == null || invokerDirectorySet.isEmpty()) {
             return null;
         }
         Random random = new Random();

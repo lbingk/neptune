@@ -51,11 +51,11 @@ public class ServiceBean<T> implements InitializingBean, ApplicationContextAware
     private void check() throws Exception {
         RegistryBean registryBean = applicationContext.getBean(RegistryBean.class);
         if (registryBean == null) {
-            throw new Exception("registry 属性没有配置");
+            throw new RuntimeException("registry 属性没有配置");
         }
         ProtocolBean serviceProtocol = (ProtocolBean) applicationContext.getBean("serviceProtocol");
         if (serviceProtocol == null) {
-            throw new Exception("serviceProtocol 属性没有配置");
+            throw new RuntimeException("serviceProtocol 属性没有配置");
         }
     }
 

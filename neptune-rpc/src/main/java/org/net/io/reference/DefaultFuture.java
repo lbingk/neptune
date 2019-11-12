@@ -1,6 +1,7 @@
 package org.net.io.reference;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.parser.Feature;
 import io.netty.channel.Channel;
 import io.netty.util.HashedWheelTimer;
 import io.netty.util.Timeout;
@@ -127,7 +128,7 @@ public class DefaultFuture {
                 lock.unlock();
             }
             if (!isDone()) {
-                throw new Exception("请求时间过长......");
+                throw new RuntimeException("请求时间过长......");
             }
             return doParseResponse();
         }
@@ -146,7 +147,7 @@ public class DefaultFuture {
         }
         if (res.getStatus() == Response.OK) {
             DefaultFuture defaultFuture = DEFAULT_FUTURE_MAP.get(res.getMid());
-            return JSON.parseObject(res.getContent(), defaultFuture.getRequest().getReturnType());
+            return JSON.parseObject(res.getContent(), defaultFuture.getRequest().getReturnType(), Feature.SortFeidFastMatch);
         }
         if (res.getStatus() == Response.SERVER_TIMEOUT) {
             throw new RuntimeException(response.errorMessage);

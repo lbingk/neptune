@@ -7,6 +7,5 @@
 
     <neptune:registry ip="127.0.0.1" port="2082" timeout="123"/>
     <import resource="classpath*:neptune-provider.xml"/>
-    <!--<import resource="classpath*:neptune-consumer.xml"/>-->
 
 </beans>

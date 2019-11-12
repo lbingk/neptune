@@ -13,8 +13,8 @@ import org.springframework.context.annotation.ImportResource;
 @SpringBootApplication()
 @ImportResource(locations = {"classpath:neptune.xml"})
 public class NeptuneProviderWebApplication {
-    public static void main(String[] args)  {
-         SpringApplication.run(NeptuneProviderWebApplication.class, args);
+    public static void main(String[] args) {
+        SpringApplication.run(NeptuneProviderWebApplication.class, args);
     }
 
 }

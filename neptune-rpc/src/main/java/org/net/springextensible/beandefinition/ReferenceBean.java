@@ -71,11 +71,11 @@ public class ReferenceBean<T> implements FactoryBean, InitializingBean, Applicat
     private void check() throws Exception {
         RegistryBean registryBean = applicationContext.getBean(RegistryBean.class);
         if (registryBean == null) {
-            throw new Exception("registry 属性没有配置");
+            throw new RuntimeException("registry 属性没有配置");
         }
         ProtocolBean referenceProtocol = (ProtocolBean) applicationContext.getBean("referenceProtocol");
         if (referenceProtocol == null) {
-            throw new Exception("referenceProtocol 属性没有配置");
+            throw new RuntimeException("referenceProtocol 属性没有配置");
         }
     }
 

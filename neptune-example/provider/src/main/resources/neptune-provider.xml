@@ -5,7 +5,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://www.neptune-rpc.org/schema/neptune-rpc http://www.neptune-rpc.org/schema/neptune-rpc.xsd">
 
-    <neptune:serviceProtocol ip="127.0.0.1" port="21881"/>
+    <neptune:serviceProtocol ip="127.0.0.1" port="21880"/>
     <neptune:service ref="studentService" interface="org.net.service.StudentService"/>
     <bean id="studentService" class="org.net.impl.StudentServiceImpl"/>
 
