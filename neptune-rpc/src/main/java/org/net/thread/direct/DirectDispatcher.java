@@ -1,20 +1,15 @@
-package org.net.thread.message;
+package org.net.thread.direct;
 
 import io.netty.channel.ChannelHandlerContext;
 import org.net.thread.Dispatcher;
 import org.net.thread.MessageReceiveTask;
-import org.net.thread.TreadPoolFactory;
-
-import java.util.concurrent.ExecutorService;
 
 /**
  * @program: neptune
- * @description: 只处理业务
+ * @description:  不开启线程池，直接由IO线程运算
  * @create: 2019-11-15 11:46
  */
-public class MessageDispatcher implements Dispatcher {
-
-    private ExecutorService executorService = TreadPoolFactory.getExecutorService();
+public class DirectDispatcher implements Dispatcher {
 
     @Override
     public void receive() {
@@ -28,6 +23,6 @@ public class MessageDispatcher implements Dispatcher {
 
     @Override
     public void handler(ChannelHandlerContext ctx, Object msg) throws Exception {
-        executorService.submit(new MessageReceiveTask(ctx, msg));
+       new MessageReceiveTask(ctx, msg).run();
     }
 }

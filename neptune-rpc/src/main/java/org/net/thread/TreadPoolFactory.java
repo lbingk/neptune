@@ -1,10 +1,11 @@
 package org.net.thread;
 
+import lombok.extern.slf4j.Slf4j;
 import org.net.springextensible.beandefinition.ProtocolBean;
 import org.net.util.SpringContextHolder;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -15,7 +16,9 @@ import java.util.concurrent.Executors;
  * @author: luobingkai
  * @create: 2019-11-15 11:53
  */
-public class TreadPoolFactory implements ApplicationContextAware {
+@Slf4j
+@Component
+public class TreadPoolFactory implements ApplicationListener<ContextRefreshedEvent> {
 
     public static ExecutorService getExecutorService() {
         return executorService;
@@ -31,11 +34,6 @@ public class TreadPoolFactory implements ApplicationContextAware {
     private static final String CACHE = "cache";
     private static final String SINGLE = "single";
 
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        executorService = create();
-    }
-
     /**
      * 根据配置的线程池参数返回对应的线程
      *
@@ -43,10 +41,12 @@ public class TreadPoolFactory implements ApplicationContextAware {
      */
     private ExecutorService create() {
         ProtocolBean protocolBean = SpringContextHolder.getBean("serviceProtocol");
+
         int threadNum = protocolBean.getThreadNum() == 0 ? FIXED_THREAD_NUM : protocolBean.getThreadNum();
+        String threadType = protocolBean.getThreadType() == null ? FIXED : protocolBean.getThreadType();
 
         ExecutorService executorService;
-        switch (protocolBean.getExecutorType()) {
+        switch (threadType) {
             case CACHE:
                 executorService = Executors.newCachedThreadPool();
                 break;
@@ -58,5 +58,10 @@ public class TreadPoolFactory implements ApplicationContextAware {
                 break;
         }
         return executorService;
+    }
+
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
+        this.executorService = create();
     }
 }

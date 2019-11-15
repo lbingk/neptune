@@ -1,4 +1,4 @@
-package org.net.thread.message;
+package org.net.thread;
 
 import io.netty.channel.ChannelHandlerContext;
 import lombok.AllArgsConstructor;

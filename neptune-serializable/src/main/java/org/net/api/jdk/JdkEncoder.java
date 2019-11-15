@@ -13,15 +13,14 @@ import org.net.api.MessageEncoderHandler;
  **/
 public class JdkEncoder extends MessageEncoderHandler {
 
-    private static JdkSerialization hessianSerialization = new JdkSerialization();
+    private static JdkSerialization jdkSerialization = new JdkSerialization();
 
     @Override
     protected void encode(ChannelHandlerContext channelHandlerContext, Object o, ByteBuf byteBuf) throws Exception {
-        // 先计算数据的大小,并发送
-        byte[] bytes = hessianSerialization.serialize(o, byteBuf);
+        // 先计算数据的大小,并发送实际数据
+        byte[] bytes = jdkSerialization.serialize(o, byteBuf);
         int dataLength= bytes.length;
-        channelHandlerContext.writeAndFlush(dataLength);
-        // 正式传送
-        channelHandlerContext.writeAndFlush(bytes);
+        byteBuf.writeInt(dataLength);
+        byteBuf.writeBytes(bytes);
     }
 }

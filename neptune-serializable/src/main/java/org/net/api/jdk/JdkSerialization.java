@@ -19,9 +19,9 @@ public class JdkSerialization implements SerializationUtil {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(bos);
         oos.writeObject(o);
-        oos.flush();
+//        oos.flush();
         byte[] bytes = bos.toByteArray();
-        byteBuf.writeBytes(bytes);
+//        byteBuf.writeBytes(bytes);
         bos.close();
         oos.close();
         return bytes;

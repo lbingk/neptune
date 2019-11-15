@@ -1,6 +1,7 @@
 package org.net.api;
 
 import io.netty.channel.ChannelInboundHandler;
+import io.netty.channel.ChannelOutboundHandler;
 import org.net.api.hessian.HessianDecoder;
 import org.net.api.hessian.HessianEncoder;
 import org.net.api.jdk.JdkDecoder;
@@ -44,7 +45,7 @@ public class MessageCoderAdapter {
     /**
      * 获取编码器
      */
-    public ChannelInboundHandler encode() {
-        return messageDecoderHandler;
+    public ChannelOutboundHandler encode() {
+        return messageEncoderHandler;
     }
 }

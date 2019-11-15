@@ -21,8 +21,8 @@ public class ServiceHandler extends ChannelInitializer<SocketChannel> {
         ChannelPipeline channelPipeline = socketChannel.pipeline();
         MessageCoderAdapter messageCoderAdapter = new MessageCoderAdapter(getProtocolType());
         // 解码与编码
-        socketChannel.pipeline().addLast("Encoder", messageCoderAdapter.encode());
-        socketChannel.pipeline().addLast("Decoder", messageCoderAdapter.decode());
+        socketChannel.pipeline().addLast("encoder", messageCoderAdapter.encode());
+        socketChannel.pipeline().addLast("decoder", messageCoderAdapter.decode());
         // 业务
         channelPipeline.addLast(new ServiceBusinessHandler());
     }

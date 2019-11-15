@@ -1,6 +1,7 @@
 package org.net.thread;
 
 import org.net.springextensible.beandefinition.ProtocolBean;
+import org.net.thread.direct.DirectDispatcher;
 import org.net.thread.message.MessageDispatcher;
 import org.net.util.SpringContextHolder;
 
@@ -30,12 +31,17 @@ public class DispatcherAdapter {
      */
     private static final String MESSAGE = "message";
     private static final String All = "all";
+    private static final String DIRECT = "direct ";
 
     public Dispatcher getDispatcher() {
         ProtocolBean serviceProtocol = SpringContextHolder.getBean("serviceProtocol");
-        switch (serviceProtocol.getExecutorType()) {
+        String executorType = serviceProtocol.getExecutorType() == null ? MESSAGE : serviceProtocol.getExecutorType();
+        switch (executorType) {
             case All:
                 // TODO
+                break;
+            case DIRECT:
+                this.dispatcher = new DirectDispatcher();
                 break;
             default:
                 this.dispatcher = new MessageDispatcher();
