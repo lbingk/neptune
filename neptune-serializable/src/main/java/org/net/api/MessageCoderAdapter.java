@@ -1,6 +1,10 @@
 package org.net.api;
 
 import io.netty.channel.ChannelInboundHandler;
+import org.net.api.hessian.HessianDecoder;
+import org.net.api.hessian.HessianEncoder;
+import org.net.api.jdk.JdkDecoder;
+import org.net.api.jdk.JdkEncoder;
 import org.net.api.msgpack.MsgpackDecoder;
 import org.net.api.msgpack.MsgpackEncoder;
 
@@ -11,16 +15,20 @@ import org.net.api.msgpack.MsgpackEncoder;
  * @Date 2019/11/14 23:21
  */
 public class MessageCoderAdapter {
-    private MessageDecoderHandler messageDecoderHandler;
-    private MessageEncoderHandler messageEncoderHandler;
+    /**
+     * 默认走JDK
+     */
+    private MessageDecoderHandler messageDecoderHandler = new JdkDecoder();
+    private MessageEncoderHandler messageEncoderHandler = new JdkEncoder();
 
     public MessageCoderAdapter(String protocolType) {
         if ("msgpack".equals(protocolType)) {
             messageDecoderHandler = new MsgpackDecoder();
             messageEncoderHandler = new MsgpackEncoder();
         }
-        if (protocolType == null) {
-            //TODO:默认走JDK
+        if ("hessian".equals(protocolType)) {
+            messageDecoderHandler = new HessianDecoder();
+            messageEncoderHandler = new HessianEncoder();
         }
     }
 

@@ -30,6 +30,12 @@ public class ProtocolBeanDefinitionNamespaceParser implements BeanDefinitionPars
         beanDef.setLazyInit(Boolean.FALSE);
         beanDef.getPropertyValues().add("ip", element.getAttribute("ip"));
         beanDef.getPropertyValues().add("port", element.getAttribute("port"));
+        beanDef.getPropertyValues().add("timeout", element.getAttribute("timeout"));
+        beanDef.getPropertyValues().add("serializeType", element.getAttribute("serializeType"));
+        beanDef.getPropertyValues().add("executorType", element.getAttribute("executorType"));
+        beanDef.getPropertyValues().add("threadType", element.getAttribute("threadType"));
+        beanDef.getPropertyValues().add("threadNum", element.getAttribute("threadNum"));
+
         BeanDefinitionRegistry beanDefRegistry = parserContext.getRegistry();
         beanDefRegistry.registerBeanDefinition(this.id, beanDef);
         return beanDef;

@@ -3,11 +3,10 @@ package org.net.io.handler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
-import io.netty.handler.codec.LengthFieldPrepender;
 import lombok.extern.slf4j.Slf4j;
-import org.net.handler.MsgpackDecoder;
-import org.net.handler.MsgpackEncoder;
+import org.net.api.MessageCoderAdapter;
+import org.net.springextensible.beandefinition.ProtocolBean;
+import org.net.util.SpringContextHolder;
 
 /**
  * @program: neptune
@@ -18,14 +17,23 @@ import org.net.handler.MsgpackEncoder;
 @Slf4j
 public class ServiceHandler extends ChannelInitializer<SocketChannel> {
     @Override
-    protected void initChannel(SocketChannel socketChannel) throws Exception {
+    protected void initChannel(SocketChannel socketChannel)  {
         ChannelPipeline channelPipeline = socketChannel.pipeline();
+        MessageCoderAdapter messageCoderAdapter = new MessageCoderAdapter(getProtocolType());
         // 解码与编码
-        socketChannel.pipeline().addLast("frameEncoder", new LengthFieldPrepender(2));
-        socketChannel.pipeline().addLast("MessagePack encoder", new MsgpackEncoder());
-        socketChannel.pipeline().addLast("frameDecoder", new LengthFieldBasedFrameDecoder(65535, 0, 2, 0, 2));
-        socketChannel.pipeline().addLast("MessagePack Decoder", new MsgpackDecoder());
+        socketChannel.pipeline().addLast("Encoder", messageCoderAdapter.encode());
+        socketChannel.pipeline().addLast("Decoder", messageCoderAdapter.decode());
         // 业务
         channelPipeline.addLast(new ServiceBusinessHandler());
+    }
+
+    /**
+     * 获取序列化协议类型
+     *
+     * @return
+     */
+    private String getProtocolType() {
+        ProtocolBean serviceProtocol = SpringContextHolder.getBean("serviceProtocol");
+        return serviceProtocol.getSerializeType();
     }
 }

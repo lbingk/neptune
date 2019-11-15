@@ -1,10 +1,9 @@
-package org.net.api.msgpack;
+package org.net.api.jdk;
 
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import org.net.api.MessageEncoderHandler;
-import org.net.api.SerializationUtil;
 
 /**
  * @Description 定义编码器：
@@ -12,18 +11,17 @@ import org.net.api.SerializationUtil;
  * @Date 2019/7/20 3:07
  * @Version 1.0
  **/
-public class MsgpackEncoder extends MessageEncoderHandler {
+public class JdkEncoder extends MessageEncoderHandler {
 
-    private static SerializationUtil msgpackSerialization = new MsgpackSerialization();
+    private static JdkSerialization hessianSerialization = new JdkSerialization();
 
     @Override
     protected void encode(ChannelHandlerContext channelHandlerContext, Object o, ByteBuf byteBuf) throws Exception {
         // 先计算数据的大小,并发送
-        byte[] bytes = msgpackSerialization.serialize(o, byteBuf);
+        byte[] bytes = hessianSerialization.serialize(o, byteBuf);
         int dataLength= bytes.length;
         channelHandlerContext.writeAndFlush(dataLength);
         // 正式传送
         channelHandlerContext.writeAndFlush(bytes);
-
     }
 }

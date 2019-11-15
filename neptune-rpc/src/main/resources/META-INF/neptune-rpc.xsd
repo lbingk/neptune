@@ -86,6 +86,10 @@
                     <!--<xsd:attribute name="name" type="xsd:string" use="required"/>-->
                     <xsd:attribute name="ip" type="xsd:string" use="required"/>
                     <xsd:attribute name="port" type="xsd:string" use="required"/>
+                    <xsd:attribute name="serializeType" type="xsd:string" use="optional"/>
+                    <xsd:attribute name="executorType" type="xsd:string" use="optional"/>
+                    <xsd:attribute name="threadType" type="xsd:string" use="optional"/>
+                    <xsd:attribute name="threadNum" type="xsd:string" use="optional"/>
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>
@@ -101,6 +105,10 @@
                     <!--<xsd:attribute name="name" type="xsd:string" use="required"/>-->
                     <xsd:attribute name="ip" type="xsd:string" use="required"/>
                     <xsd:attribute name="port" type="xsd:string" use="required"/>
+                    <xsd:attribute name="serializeType" type="xsd:string" use="optional"/>
+                    <xsd:attribute name="executorType" type="xsd:string" use="optional"/>
+                    <xsd:attribute name="threadType" type="xsd:string" use="optional"/>
+                    <xsd:attribute name="threadNum" type="xsd:string" use="optional"/>
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>

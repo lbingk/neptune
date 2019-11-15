@@ -19,7 +19,6 @@ public class MsgpackSerialization implements SerializationUtil {
     @Override
     public byte[] serialize(Object o, ByteBuf byteBuf) throws IOException {
         MessagePack messagePack = new MessagePack();
-        /** 序列化对象*/
         byte[] raw = messagePack.write(o);
         byteBuf.writeBytes(raw);
         return raw;

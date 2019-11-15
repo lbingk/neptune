@@ -20,5 +20,9 @@ public class ProtocolBean {
     private String ip;
     private int port;
     private int timeout;
+    private String serializeType;
+    private String executorType;
+    private String threadType;
+    private int threadNum;
 
 }

@@ -1,4 +1,4 @@
-package org.net.api.jdk;
+package org.net.api.hessian;
 
 
 import io.netty.buffer.ByteBuf;
@@ -14,11 +14,11 @@ import java.util.List;
  * @Date 2019/7/20 3:07
  * @Version 1.0
  **/
-public class JDKDecoder extends MessageDecoderHandler {
+public class HessianDecoder extends MessageDecoderHandler {
 
-    private static SerializationUtil msgpackSerialization = new JDKSerialization();
+    private static SerializationUtil serializationUtil = new HessianSerialization();
 
-    protected JDKDecoder(SerializationUtil serializationUtil) {
+    public HessianDecoder() {
         super(serializationUtil);
     }
 

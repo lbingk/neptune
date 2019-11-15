@@ -11,7 +11,13 @@ import io.netty.handler.codec.MessageToByteEncoder;
  * @Date 2019/11/14 23:16
  */
 public abstract class MessageEncoderHandler extends MessageToByteEncoder<Object> {
-
+    /**
+     *  编码
+     * @param channelHandlerContext
+     * @param o
+     * @param byteBuf
+     * @throws Exception
+     */
     @Override
     protected abstract void encode(ChannelHandlerContext channelHandlerContext, Object o, ByteBuf byteBuf) throws Exception;
 }

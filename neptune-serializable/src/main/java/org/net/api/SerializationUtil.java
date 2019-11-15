@@ -19,5 +19,5 @@ public interface SerializationUtil {
      */
     byte[] serialize(Object o, ByteBuf byteBuf) throws IOException;
 
-    void deserialize(ByteBuf msg, List<Object> out) throws IOException;
+    void deserialize(ByteBuf msg, List<Object> out) throws  Exception;
 }
