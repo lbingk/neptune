@@ -5,7 +5,7 @@ import org.net.api.SerializationUtil;
 import java.io.*;
 
 /**
- * @Classname MsgpackSer
+ * @Classname JdkSerialization
  * @author: LUOBINGKAI
  * @Description JDK序列化与反序列化
  * @Date 2019/11/14 23:32
