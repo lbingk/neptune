@@ -18,10 +18,10 @@ public class HessianEncoder extends MessageEncoderHandler {
     @Override
     protected void encode(ChannelHandlerContext channelHandlerContext, Object o, ByteBuf byteBuf) throws Exception {
         // 先计算数据的大小,并发送
-        byte[] bytes = hessianSerialization.serialize(o, byteBuf);
+        byte[] bytes = hessianSerialization.serialize(o);
         int dataLength= bytes.length;
-        channelHandlerContext.writeAndFlush(dataLength);
+        byteBuf.writeInt(dataLength);
         // 正式传送
-        channelHandlerContext.writeAndFlush(bytes);
+        byteBuf.writeBytes(bytes);
     }
 }

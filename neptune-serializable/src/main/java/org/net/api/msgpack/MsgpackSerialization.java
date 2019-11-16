@@ -17,11 +17,9 @@ import java.util.List;
 public class MsgpackSerialization implements SerializationUtil {
 
     @Override
-    public byte[] serialize(Object o, ByteBuf byteBuf) throws IOException {
+    public byte[] serialize(Object o) throws IOException {
         MessagePack messagePack = new MessagePack();
-        byte[] raw = messagePack.write(o);
-        byteBuf.writeBytes(raw);
-        return raw;
+        return messagePack.write(o);
     }
 
     @Override

@@ -25,9 +25,16 @@ public abstract class MessageDecoderHandler extends ByteToMessageDecoder {
         if (buffer.readableBytes() < MessageCoderAdapter.MESSAGE_LENGTH) {
             return;
         }
+
         buffer.markReaderIndex();
-        int length = buffer.readInt();
-        if (buffer.readableBytes() < length) {
+        int messageLength = buffer.readInt();
+
+        if(messageLength<0){
+//            ctx.close();
+            return;
+        }
+
+        if (buffer.readableBytes() < messageLength) {
             buffer.resetReaderIndex();
             return;
         }

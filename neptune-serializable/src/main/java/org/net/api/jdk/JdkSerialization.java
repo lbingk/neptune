@@ -5,7 +5,7 @@ import org.msgpack.MessagePack;
 import org.msgpack.type.Value;
 import org.net.api.SerializationUtil;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 
 /**
@@ -17,21 +17,25 @@ import java.util.List;
 public class JdkSerialization implements SerializationUtil {
 
     @Override
-    public byte[] serialize(Object o, ByteBuf byteBuf) throws IOException {
-        MessagePack messagePack = new MessagePack();
-        /** 序列化对象*/
-        byte[] raw = messagePack.write(o);
-        byteBuf.writeBytes(raw);
-        return raw;
+    public byte[] serialize(Object o) throws IOException {
+        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+        ObjectOutputStream objOut = new ObjectOutputStream(byteOut);
+        objOut.writeObject(o);
+        objOut.close();
+        return byteOut.toByteArray();
     }
 
+
     @Override
-    public void deserialize(ByteBuf byteBuf, List<Object> list) throws IOException {
+    public void deserialize(ByteBuf byteBuf, List<Object> list) throws Exception {
         int length = byteBuf.readableBytes();
         byte[] array = new byte[length];
         byteBuf.getBytes(byteBuf.readerIndex(), array, 0, length);
-        MessagePack messagePack = new MessagePack();
-        Value read = messagePack.read(array);
-        list.add(read);
+
+        ByteArrayInputStream byteIn = new ByteArrayInputStream(array);
+        ObjectInputStream objIn = new ObjectInputStream(byteIn);
+        Object obj = objIn.readObject();
+        objIn.close();
+        list.add(obj);
     }
 }

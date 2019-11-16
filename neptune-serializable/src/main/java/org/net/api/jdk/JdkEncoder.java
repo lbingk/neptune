@@ -18,7 +18,7 @@ public class JdkEncoder extends MessageEncoderHandler {
     @Override
     protected void encode(ChannelHandlerContext channelHandlerContext, Object o, ByteBuf byteBuf) throws Exception {
         // 先计算数据的大小,并发送实际数据
-        byte[] bytes = jdkSerialization.serialize(o, byteBuf);
+        byte[] bytes = jdkSerialization.serialize(o);
         int dataLength= bytes.length;
         byteBuf.writeInt(dataLength);
         byteBuf.writeBytes(bytes);

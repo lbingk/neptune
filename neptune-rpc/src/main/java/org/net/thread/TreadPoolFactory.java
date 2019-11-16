@@ -40,10 +40,12 @@ public class TreadPoolFactory implements ApplicationListener<ContextRefreshedEve
      * @return
      */
     private ExecutorService create() {
-        ProtocolBean protocolBean = SpringContextHolder.getBean("serviceProtocol");
-
-        int threadNum = protocolBean.getThreadNum() == 0 ? FIXED_THREAD_NUM : protocolBean.getThreadNum();
-        String threadType = protocolBean.getThreadType() == null ? FIXED : protocolBean.getThreadType();
+        ProtocolBean serviceProtocol = SpringContextHolder.getBean("serviceProtocol");
+        if (serviceProtocol == null) {
+            return null;
+        }
+        int threadNum = serviceProtocol.getThreadNum() == 0 ? FIXED_THREAD_NUM : serviceProtocol.getThreadNum();
+        String threadType = serviceProtocol.getThreadType() == null ? FIXED : serviceProtocol.getThreadType();
 
         ExecutorService executorService;
         switch (threadType) {

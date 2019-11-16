@@ -19,11 +19,9 @@ public class MsgpackEncoder extends MessageEncoderHandler {
     @Override
     protected void encode(ChannelHandlerContext channelHandlerContext, Object o, ByteBuf byteBuf) throws Exception {
         // 先计算数据的大小,并发送
-        byte[] bytes = msgpackSerialization.serialize(o, byteBuf);
+        byte[] bytes = msgpackSerialization.serialize(o);
         int dataLength= bytes.length;
-        channelHandlerContext.writeAndFlush(dataLength);
-        // 正式传送
-        channelHandlerContext.writeAndFlush(bytes);
-
+        byteBuf.writeInt(dataLength);
+        byteBuf.writeBytes(bytes);
     }
 }

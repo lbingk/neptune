@@ -19,12 +19,12 @@ import java.util.List;
 public class HessianSerialization implements SerializationUtil {
 
     @Override
-    public byte[] serialize(Object o, ByteBuf byteBuf) throws IOException {
+    public byte[] serialize(Object o) throws IOException {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         Hessian2Output output = new Hessian2Output(os);
         output.writeObject(o);
         byte[] bytes = os.toByteArray();
-        byteBuf.writeBytes(bytes);
+//        byteBuf.writeBytes(bytes);
         output.close();
         return bytes;
     }
