@@ -87,10 +87,10 @@
                     <xsd:attribute name="ip" type="xsd:string" use="required"/>
                     <xsd:attribute name="port" type="xsd:string" use="required"/>
                     <xsd:attribute name="timeout" type="xsd:int" use="required"/>
-                    <xsd:attribute name="serializeType" type="xsd:string" use="optional"/>
-                    <xsd:attribute name="executorType" type="xsd:string" use="optional"/>
-                    <xsd:attribute name="threadType" type="xsd:string" use="optional"/>
-                    <xsd:attribute name="threadNum" type="xsd:string" use="optional"/>
+                    <xsd:attribute name="serializeType" type="xsd:string" use="optional" default="jdk"/>
+                    <xsd:attribute name="executorType" type="xsd:string" use="optional" default="message"/>
+                    <xsd:attribute name="threadType" type="xsd:string" use="optional" default="fixed"/>
+                    <xsd:attribute name="threadNum" type="xsd:string" use="optional" default="200"/>
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>
@@ -107,6 +107,7 @@
                     <xsd:attribute name="ip" type="xsd:string" use="required"/>
                     <xsd:attribute name="port" type="xsd:string" use="required"/>
                     <xsd:attribute name="timeout" type="xsd:int" use="required"/>
+                    <xsd:attribute name="serializeType" type="xsd:string" use="optional" default="jdk"/>
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>

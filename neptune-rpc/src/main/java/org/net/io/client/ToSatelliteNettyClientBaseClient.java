@@ -5,13 +5,11 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
-import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.timeout.IdleStateHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.net.api.msgpack.MsgpackDecoder;
+import org.net.api.msgpack.MsgpackEncoder;
 import org.net.constant.TransportTypeEnum;
-import org.net.handler.MsgpackDecoder;
-import org.net.handler.MsgpackEncoder;
 import org.net.invoke.InvokerBeanInfo;
 import org.net.io.handler.ConnectionWatchDogHandler;
 import org.net.io.handler.ToSatelliteBusinessHandler;
@@ -92,10 +90,8 @@ public abstract class ToSatelliteNettyClientBaseClient {
             ChannelPipeline channelPipeline = ch.pipeline();
             // 心跳机制:4s周期没有发生事件，就触发userEventTriggered方法
             ch.pipeline().addLast(new IdleStateHandler(5, 0, 0, TimeUnit.SECONDS));
-            ch.pipeline().addLast("frameEncoder", new LengthFieldPrepender(2));
-            ch.pipeline().addLast("MessagePack encoder", new MsgpackEncoder());
-            ch.pipeline().addLast("frameDecoder", new LengthFieldBasedFrameDecoder(65535, 0, 2, 0, 2));
-            ch.pipeline().addLast("MessagePack Decoder", new MsgpackDecoder());
+            ch.pipeline().addLast("encoder", new MsgpackEncoder());
+            ch.pipeline().addLast("decoder", new MsgpackDecoder());
             // 调用自定义的看门狗重连处理类，主要处理异常重连
             channelPipeline.addLast(ConnectionWatchDogHandler.createConnectionWatchDogHandler(bootstrap, ToSatelliteNettyClientBaseClient.this));
             channelPipeline.addLast(new ToSatelliteBusinessHandler());

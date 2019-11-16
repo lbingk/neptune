@@ -1,17 +1,18 @@
 package org.net.io;
 
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.*;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
-import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.timeout.IdleStateHandler;
-import org.net.manager.RegistrationDirectory;
-import org.net.handler.MsgpackDecoder;
-import org.net.handler.MsgpackEncoder;
+import org.net.api.msgpack.MsgpackDecoder;
+import org.net.api.msgpack.MsgpackEncoder;
 import org.net.io.handler.BusinessHandler;
+import org.net.manager.RegistrationDirectory;
 import org.net.springextensible.RegistrationBeanDefinition;
 import org.net.util.SpringContextHolder;
 import org.springframework.context.ApplicationListener;
@@ -46,10 +47,8 @@ public class NettyServer implements ApplicationListener<ContextRefreshedEvent> {
                         // 解码，编码以及业务逻辑处理链，10秒没有发生写事件，就触发userEventTriggered
                         ChannelPipeline pipeline = socketChannel.pipeline();
                         socketChannel.pipeline().addLast(new IdleStateHandler(0, 10, 0, TimeUnit.SECONDS));
-                        socketChannel.pipeline().addLast("frameDecoder", new LengthFieldBasedFrameDecoder(65535, 0, 2, 0, 2));
-                        socketChannel.pipeline().addLast("MessagePack Decoder", new MsgpackDecoder());
-                        socketChannel.pipeline().addLast("frameEncoder", new LengthFieldPrepender(2));
-                        socketChannel.pipeline().addLast("MessagePack encoder", new MsgpackEncoder());
+                        socketChannel.pipeline().addLast("decoder", new MsgpackDecoder());
+                        socketChannel.pipeline().addLast("encoder", new MsgpackEncoder());
                         pipeline.addLast(new BusinessHandler());
                     }
                 }).option(ChannelOption.SO_BACKLOG, 2048 * 2048 * 2048);
