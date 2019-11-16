@@ -1,14 +1,12 @@
 package org.net.api.hessian;
 
 import com.caucho.hessian.io.Hessian2Output;
-import io.netty.buffer.ByteBuf;
 import org.net.api.SerializationUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.List;
 
 /**
  * @Classname MsgpackSer
@@ -30,13 +28,9 @@ public class HessianSerialization implements SerializationUtil {
     }
 
     @Override
-    public void deserialize(ByteBuf byteBuf, List<Object> list) throws Exception {
-        int length = byteBuf.readableBytes();
-        byte[] array = new byte[length];
-        byteBuf.getBytes(byteBuf.readerIndex(), array, 0, length);
-
-        ByteArrayInputStream is = new ByteArrayInputStream(array);
+    public Object deserialize(byte[] ins) throws Exception {
+        ByteArrayInputStream is = new ByteArrayInputStream(ins);
         ObjectInputStream in = new ObjectInputStream(is);
-        list.add(in.readObject());
+        return in;
     }
 }

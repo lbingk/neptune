@@ -1,9 +1,6 @@
 package org.net.api;
 
-import io.netty.buffer.ByteBuf;
-
 import java.io.IOException;
-import java.util.List;
 
 /**
  * @Classname SerializationUtil
@@ -14,9 +11,19 @@ import java.util.List;
 public interface SerializationUtil {
     /**
      * 序列化
-     *  @param o
+     *
+     * @param out
+     * @return
+     * @throws IOException
      */
-    byte[] serialize(Object o) throws IOException;
+    byte[] serialize(Object out) throws IOException;
 
-    void deserialize(ByteBuf msg, List<Object> out) throws  Exception;
+    /**
+     * 反序列化
+     *
+     * @param in
+     * @return
+     * @throws Exception
+     */
+    Object deserialize(byte[] in) throws Exception;
 }

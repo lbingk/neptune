@@ -1,12 +1,10 @@
 package org.net.api.msgpack;
 
-import io.netty.buffer.ByteBuf;
 import org.msgpack.MessagePack;
 import org.msgpack.type.Value;
 import org.net.api.SerializationUtil;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * @Classname MsgpackSer
@@ -17,18 +15,15 @@ import java.util.List;
 public class MsgpackSerialization implements SerializationUtil {
 
     @Override
-    public byte[] serialize(Object o) throws IOException {
+    public byte[] serialize(Object out) throws IOException {
         MessagePack messagePack = new MessagePack();
-        return messagePack.write(o);
+        return messagePack.write(out);
     }
 
     @Override
-    public void deserialize(ByteBuf byteBuf, List<Object> list) throws IOException {
-        int length = byteBuf.readableBytes();
-        byte[] array = new byte[length];
-        byteBuf.getBytes(byteBuf.readerIndex(), array, 0, length);
+    public Object deserialize(byte[] ins) throws IOException {
         MessagePack messagePack = new MessagePack();
-        Value read = messagePack.read(array);
-        list.add(read);
+        Value read = messagePack.read(ins);
+        return read;
     }
 }

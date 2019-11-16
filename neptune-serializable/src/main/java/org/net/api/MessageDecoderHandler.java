@@ -29,18 +29,13 @@ public abstract class MessageDecoderHandler extends ByteToMessageDecoder {
         buffer.markReaderIndex();
         int messageLength = buffer.readInt();
 
-        if(messageLength<0){
-//            ctx.close();
-            return;
-        }
-
         if (buffer.readableBytes() < messageLength) {
             buffer.resetReaderIndex();
             return;
         }
-//        byte[] bytes = new byte[length];
-//        buffer.readBytes(bytes);
-//        out.add(bytes);
-        serializationUtil.deserialize(buffer, out);
+        byte[] ins = new byte[messageLength];
+        buffer.readBytes(ins);
+        Object o = serializationUtil.deserialize(ins);
+        out.add(o);
     }
 }
