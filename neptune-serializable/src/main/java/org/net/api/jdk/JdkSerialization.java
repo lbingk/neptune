@@ -1,37 +1,33 @@
 package org.net.api.jdk;
 
-import io.netty.buffer.ByteBuf;
-import org.msgpack.MessagePack;
-import org.msgpack.type.Value;
 import org.net.api.SerializationUtil;
 
-import java.io.IOException;
-import java.util.List;
+import java.io.*;
 
 /**
- * @Classname MsgpackSer
+ * @Classname JdkSerialization
  * @author: LUOBINGKAI
  * @Description JDK序列化与反序列化
  * @Date 2019/11/14 23:32
  */
-public class JDKSerialization implements SerializationUtil {
+public class JdkSerialization implements SerializationUtil {
 
     @Override
-    public byte[] serialize(Object o, ByteBuf byteBuf) throws IOException {
-        MessagePack messagePack = new MessagePack();
-        /** 序列化对象*/
-        byte[] raw = messagePack.write(o);
-        byteBuf.writeBytes(raw);
-        return raw;
+    public byte[] serialize(Object out) throws IOException {
+        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+        ObjectOutputStream objOut = new ObjectOutputStream(byteOut);
+        objOut.writeObject(out);
+        objOut.close();
+        return byteOut.toByteArray();
     }
 
+
     @Override
-    public void deserialize(ByteBuf byteBuf, List<Object> list) throws IOException {
-        int length = byteBuf.readableBytes();
-        byte[] array = new byte[length];
-        byteBuf.getBytes(byteBuf.readerIndex(), array, 0, length);
-        MessagePack messagePack = new MessagePack();
-        Value read = messagePack.read(array);
-        list.add(read);
+    public Object  deserialize(byte[] in) throws Exception {
+        ByteArrayInputStream byteIn = new ByteArrayInputStream(in);
+        ObjectInputStream objIn = new ObjectInputStream(byteIn);
+        Object obj = objIn.readObject();
+        objIn.close();
+        return obj;
     }
 }
