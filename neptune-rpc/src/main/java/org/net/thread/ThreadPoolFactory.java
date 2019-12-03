@@ -18,7 +18,7 @@ import java.util.concurrent.Executors;
  */
 @Slf4j
 @Component
-public class TreadPoolFactory implements ApplicationListener<ContextRefreshedEvent> {
+public class ThreadPoolFactory implements ApplicationListener<ContextRefreshedEvent> {
 
     public static ExecutorService getExecutorService() {
         return executorService;

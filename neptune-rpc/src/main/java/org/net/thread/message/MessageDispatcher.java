@@ -3,7 +3,7 @@ package org.net.thread.message;
 import io.netty.channel.ChannelHandlerContext;
 import org.net.thread.Dispatcher;
 import org.net.thread.MessageReceiveTask;
-import org.net.thread.TreadPoolFactory;
+import org.net.thread.ThreadPoolFactory;
 
 import java.util.concurrent.ExecutorService;
 
@@ -14,7 +14,7 @@ import java.util.concurrent.ExecutorService;
  */
 public class MessageDispatcher implements Dispatcher {
 
-    private ExecutorService executorService = TreadPoolFactory.getExecutorService();
+    private ExecutorService executorService = ThreadPoolFactory.getExecutorService();
 
     @Override
     public void receive() {
