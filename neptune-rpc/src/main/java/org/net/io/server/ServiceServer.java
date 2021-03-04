@@ -49,7 +49,7 @@ public class ServiceServer implements ApplicationListener<ContextRefreshedEvent>
     private void doOpen() {
         // 创建Boss：作用于客户端的连接
         bossGroup = new NioEventLoopGroup();
-        // 创建woker：作用于迭代器可用的连接
+        // 创建worker：作用于迭代器可用的连接
         workerGroup = new NioEventLoopGroup();
         // 创建 ServerBootstrap：启动类
         bootstrap = new ServerBootstrap();

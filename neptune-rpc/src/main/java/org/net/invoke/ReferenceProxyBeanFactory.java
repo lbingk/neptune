@@ -14,7 +14,10 @@ import java.lang.reflect.Proxy;
  */
 public class ReferenceProxyBeanFactory {
     public static <T> T createProxy(ReferenceBean<T> referenceBean) {
-        return (T) Proxy.newProxyInstance(ReferenceProxyBeanFactory.class.getClassLoader(), new Class<?>[]{referenceBean.getInterfaceClass()}, new ReferenceProxyBean(new Invoker(referenceBean)));
+        return (T) Proxy.newProxyInstance(
+                ReferenceProxyBeanFactory.class.getClassLoader(),
+                new Class<?>[]{referenceBean.getInterfaceClass()},
+                new ReferenceProxyBean(new Invoker(referenceBean)));
     }
 
     static class ReferenceProxyBean<T> implements InvocationHandler {

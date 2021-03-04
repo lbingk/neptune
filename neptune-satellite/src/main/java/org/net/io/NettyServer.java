@@ -35,7 +35,7 @@ public class NettyServer implements ApplicationListener<ContextRefreshedEvent> {
         RegistrationBeanDefinition registrationBeanDefinition = SpringContextHolder.getBean(RegistrationBeanDefinition.class);
         // 创建Boss：作用于客户端的连接
         EventLoopGroup bossGroup = new NioEventLoopGroup();
-        // 创建woker：作用于迭代器可用的连接
+        // 创建worker：作用于迭代器可用的连接
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         // 创建 ServerBootstrap：启动类
         ServerBootstrap bootstrap = new ServerBootstrap();

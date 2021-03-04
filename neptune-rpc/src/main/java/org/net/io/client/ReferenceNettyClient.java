@@ -19,7 +19,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @program: neptune
+ * @program:
  * @description: 消费端调用服务端的netty客户端
  * @author: LUOBINGKAI
  * @create: 2019-11-02 16:56
